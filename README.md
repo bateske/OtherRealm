@@ -11,17 +11,17 @@
   A 48 MHz RISC-V, 20 KB of RAM, and a 128 × 128 window into Another World.
 </p>
 
-[![Release](https://img.shields.io/github/v/release/bateske/Otherrealm?include_prereleases&color=d0ad62)](https://github.com/bateske/Otherrealm/releases) [![Platform](https://img.shields.io/badge/platform-CHGame-406fa0)](https://github.com/bateske/CHGame) [![Engine](https://img.shields.io/badge/engine-GPL--2.0--or--later-5c806b)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/bateske/OtherRealm?include_prereleases&style=for-the-badge&color=d0ad62)](https://github.com/bateske/OtherRealm/releases) [![Platform](https://img.shields.io/badge/platform-CHGame-406fa0?style=for-the-badge)](https://github.com/bateske/CHGame) [![Engine](https://img.shields.io/badge/engine-GPL--2.0--or--later-5c806b?style=for-the-badge)](LICENSE)
 
-[![Flash](https://img.shields.io/badge/flash-33%2C808_B-405274)](#how-it-works) [![RAM](https://img.shields.io/badge/static_RAM-17%2C980_B-405274)](#how-it-works)
+[![Flash](https://img.shields.io/badge/flash-33%2C808_B-405274?style=for-the-badge)](#how-it-works) [![RAM](https://img.shields.io/badge/static_RAM-17%2C980_B-405274?style=for-the-badge)](#how-it-works)
 
 <p>
-  <a href="https://github.com/bateske/Otherrealm/releases"><strong>Download the engine & patcher »</strong></a><br><br>
+  <a href="https://github.com/bateske/OtherRealm/releases"><strong>Download the engine & patcher »</strong></a><br><br>
   <a href="#getting-started">Get playing</a> ·
   <a href="#controls">Controls</a> ·
   <a href="BUILDING.md">Build it</a> ·
   <a href="#credits">Credits</a> ·
-  <a href="https://github.com/bateske/Otherrealm/issues">Report a bug</a>
+  <a href="https://github.com/bateske/OtherRealm/issues">Report a bug</a>
 </p>
 
 </div>
@@ -105,7 +105,7 @@ an unsupported revision stops with an error instead of producing a broken game.
 
 ### 2. Build your personal cartridge
 
-Download **Otherrealm-Patcher-Windows.zip** from [Releases](https://github.com/bateske/Otherrealm/releases).
+Download **Otherrealm-Patcher-Windows.zip** from [Releases](https://github.com/bateske/OtherRealm/releases).
 Extract the entire folder, open **Otherrealm-Patcher.exe**, choose your source
 folder and a new output folder, then click **Build my cartridge**.
 

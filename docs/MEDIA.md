@@ -14,6 +14,11 @@ The patcher renders each buyer's backgrounds from their own game files and
 constructs their cover during packaging. It does not use the promotional cover
 as a source for gameplay or include a captured original scene in the patcher.
 
+`social-card.jpg` is separate generated promotional artwork based on the shoreline
+and project wordmark. It is ready for the repository's Social preview setting;
+see [the upload instructions and generation prompt](SOCIAL_CARD.md). It is not
+an engine screenshot and is not included in the game cartridge.
+
 ## Reproduce the assets
 
 Build the title helper with `OR_WIDTH=208`, as in [BUILDING.md](../BUILDING.md),

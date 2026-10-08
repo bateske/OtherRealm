@@ -21,7 +21,7 @@ def main():
         "tools/licenses": ("*.txt",),
         "tests": ("*.cpp", "*.mjs", "*.py"),
         "tests/replays": ("*.csv",),
-        "docs": ("*.md", "banner.png", "cart.png", "cart-menu-preview.png", "gameplay.gif", "gameplay.json"),
+        "docs": ("*.md", "banner.png", "cart.png", "cart-menu-preview.png", "gameplay.gif", "gameplay.json", "social-card.jpg"),
         ".github/workflows": ("*.yml",),
         "demo": ("*.json", "*.md", "*.txt", "title.bin"),
         "assets": ("title.png",),
