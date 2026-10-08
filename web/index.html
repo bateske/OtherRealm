@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Otherrealm · Vector engine</title>
+<style>
+:root{color-scheme:dark;font-family:ui-sans-serif,system-ui,sans-serif;background:#101516;color:#ecf0e9}*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:28px;display:grid;place-content:center}main{max-width:780px;width:min(780px,90vw)}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}h1{font-size:24px;font-weight:500;margin:0}small{color:#9faea8;font-size:12px;letter-spacing:1px}.stage{background:#060909;border:1px solid #303d37;border-radius:14px;padding:18px;display:flex;justify-content:center;box-shadow:0 20px 80px #0005}canvas{width:min(100%,512px);image-rendering:pixelated;aspect-ratio:1;background:black;outline:none}.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px}button,label{border:1px solid #40514a;border-radius:6px;padding:11px 16px;background:#1b2621;color:#e2ebe5;font:inherit;font-size:13px;cursor:pointer}button:hover,label:hover{background:#2f4539}button:disabled{opacity:.5;cursor:wait}#status{color:#aac4b5;font-size:13px;min-height:20px;flex:1;text-align:right}footer{display:flex;justify-content:space-between;gap:20px;color:#8a9992;font-size:13px;margin-top:20px;line-height:1.7}kbd{font:inherit;color:#d3dfd6}input{display:none}.tag{border:1px solid #35443d;padding:7px 10px;border-radius:30px;font-size:11px}@media(max-width:620px){body{padding:18px}.stage{padding:8px}footer{display:block}.tag{display:none}#status{flex-basis:100%;text-align:left}}
+</style>
+<main><header><div><small>SD SCRIPTED VECTOR ENGINE</small><h1>Otherrealm</h1></div><span class="tag">CHGAME / 128 × 128</span></header>
+<div class="stage"><canvas id="screen" width="128" height="128" tabindex="0" aria-label="Game display. Arrow keys move. Space selects or acts. Enter opens the menu. Escape goes back."></canvas></div>
+<div class="bar"><button id="demo" disabled>Play Signal Grove</button><label>Load .PAK<input id="file" type="file" accept=".pak"></label><button id="menu" disabled>Start menu</button><span id="status">Loading engine…</span></div>
+<footer><div><kbd>← ↑ ↓ →</kbd> Move &nbsp; <kbd>Space / Z</kbd> Action &nbsp; <kbd>X</kbd> Jump<br><kbd>Enter / P</kbd> Menu · <kbd>Esc</kbd> Back · <kbd>Space</kbd> Select</div><div>Autosaves stay in this browser. Reload the same pack to continue.<br>Piezo sound cues · Toggle sound in the menu.</div></footer></main>
+<script src="otherrealm.js"></script><script>
+const screen=document.getElementById('screen'),ctx=screen.getContext('2d'),status=document.getElementById('status');
+let mod,ptr=0,length=0,running=false,deadline=0,keys=new Set(),isDemo=false;
+let audioContext,voice,soundEnabled=true;
+function unlockAudio(){if(!audioContext)audioContext=new AudioContext();if(audioContext.state==='suspended')audioContext.resume();}
+function playTone(hz,ms){if(!soundEnabled||!audioContext||audioContext.state!=='running')return;
+ if(voice){try{voice.stop()}catch(e){}}const osc=audioContext.createOscillator(),gain=audioContext.createGain(),now=audioContext.currentTime;
+ osc.type='triangle';osc.frequency.value=hz;gain.gain.setValueAtTime(0.045,now);gain.gain.exponentialRampToValueAtTime(0.001,now+ms/1000);
+ osc.connect(gain).connect(audioContext.destination);osc.start();osc.stop(now+ms/1000);voice=osc;osc.onended=()=>{osc.disconnect();gain.disconnect()};}
+window.addEventListener('pointerdown',unlockAudio);window.addEventListener('keydown',unlockAudio);
+const showError=e=>{running=false;status.textContent=String(e.message||e||'Engine error')};
+function draw(){const at=mod._or_screen(),out=ctx.createImageData(128,128),heap=mod.HEAPU8;
+for(let i=0;i<128*128;i++){let c=heap[at+i*2]|heap[at+i*2+1]<<8;out.data[i*4]=(c>>11)*255/31;out.data[i*4+1]=((c>>5)&63)*255/63;out.data[i*4+2]=(c&31)*255/31;out.data[i*4+3]=255;}ctx.putImageData(out,0,0);}
+function start(){if(!mod._or_init(ptr,length,16001))throw Error(mod.UTF8ToString(mod._or_error()));running=true;deadline=performance.now();keys.clear();screen.focus();draw();}
+function update(buttons){if(!mod._or_buttons(buttons)){showError(mod.UTF8ToString(mod._or_error()));return;}
+draw();status.textContent=(isDemo?'Signal Grove':'Private game')+' · Scene '+mod._or_part()+(mod._or_menu()?' · Menu':' · '+mod._or_frames()+' frames')+(mod._or_save_failed()?' · Save failed: RAM only':mod._or_saved()?' · Checkpoint saved':'');
+if(mod._or_exit()){running=false;status.textContent='Game closed · Reload a pack to continue';}}
+function input(){return (keys.has('ArrowRight')?32:0)|(keys.has('ArrowLeft')?16:0)|(keys.has('ArrowDown')?8:0)|(keys.has('ArrowUp')?4:0)|((keys.has('x')||keys.has('Escape'))?2:0)|((keys.has(' ')||keys.has('z'))?1:0)|((keys.has('Enter')||keys.has('p'))?64:0);}
+function loop(now){if(running){if(!mod._or_animate(now>>>0)){showError(mod.UTF8ToString(mod._or_error()));return;}if(now>=deadline){update(input());deadline=now+Math.max(16,mod._or_delay());}else if(mod._or_menu())draw();}requestAnimationFrame(loop);}
+async function load(bytes,demo){running=false;if(ptr)mod._free(ptr);length=bytes.byteLength;ptr=mod._malloc(length);if(!ptr)throw Error('Cannot allocate pack');mod.HEAPU8.set(new Uint8Array(bytes),ptr);isDemo=demo;document.getElementById('menu').disabled=false;start();}
+document.getElementById('demo').onclick=async()=>{try{const r=await fetch('../demo/sd/OTHERWRL.PAK');if(!r.ok)throw Error('Build the demo pack first');await load(await r.arrayBuffer(),true);}catch(e){showError(e)}};
+document.getElementById('file').onchange=async e=>{try{await load(await e.target.files[0].arrayBuffer(),false)}catch(e){showError(e)}};
+document.getElementById('menu').onclick=()=>{if(running){update(0);update(64);update(0);screen.focus();}};
+window.addEventListener('keydown',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','z','x','p','Enter','Escape'].includes(k)){e.preventDefault();keys.add(k);if(running&&!e.repeat)update(input());}});
+window.addEventListener('keyup',e=>{keys.delete(e.key.length===1?e.key.toLowerCase():e.key);if(running&&mod._or_menu())update(input());});window.addEventListener('blur',()=>keys.clear());
+OtherrealmModule().then(m=>{mod=m;mod.playTone=playTone;mod.enableSound=on=>{soundEnabled=on;if(!on&&voice){try{voice.stop()}catch(e){}}};document.getElementById('demo').disabled=false;status.textContent='Choose a game pack';requestAnimationFrame(loop)}).catch(showError);
+</script></html>

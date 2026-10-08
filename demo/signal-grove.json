@@ -1,0 +1,58 @@
+{
+  "title": "SIGNAL GROVE",
+  "palette": ["101523", "29314D", "465376", "778BA0", "193D39", "2F6B54", "55AA77", "AADD99", "6C553D", "AB8656", "F1C678", "EDF2CE", "AA5470", "D58DAD", "5DCAD0", "294766"],
+  "scenes": [
+    {
+      "id": 16001, "name": "THE HOLLOW", "sky": 0,
+      "objects": [
+        {"kind": "strip", "color": 1, "rows": [[70, 70, 70], [135, 0, 160]]},
+        {"kind": "strip", "color": 1, "rows": [[55, 200, 200], [140, 100, 300]]},
+        {"kind": "strip", "color": 2, "rows": [[76, 205, 205], [93, 188, 222]]},
+        {"kind": "rect", "color": 4, "box": [0, 157, 160, 43]},
+        {"kind": "rect", "color": 4, "box": [160, 157, 160, 43]},
+        {"kind": "rect", "color": 5, "box": [0, 155, 160, 4]},
+        {"kind": "rect", "color": 5, "box": [160, 155, 160, 4]},
+        {"kind": "tree", "position": [25, 153], "size": 1},
+        {"kind": "tree", "position": [287, 153], "size": 1},
+        {"kind": "rect", "color": 9, "box": [86, 145, 48, 10]},
+        {"kind": "rect", "color": 8, "box": [91, 128, 38, 17]},
+        {"kind": "rect", "color": 14, "box": [97, 124, 26, 5]},
+        {"kind": "text", "color": 10, "position": [52, 174], "text": "SEEK THE LOST SIGNAL"}
+      ]
+    },
+    {
+      "id": 16010, "name": "RELAY SHRINE", "sky": 0,
+      "objects": [
+        {"kind": "rect", "color": 1, "box": [15, 67, 55, 88]},
+        {"kind": "rect", "color": 1, "box": [245, 52, 58, 104]},
+        {"kind": "strip", "color": 2, "rows": [[60, 27, 55], [68, 15, 70]]},
+        {"kind": "rect", "color": 3, "box": [26, 85, 8, 55]},
+        {"kind": "rect", "color": 2, "box": [259, 65, 8, 75]},
+        {"kind": "rect", "color": 4, "box": [0, 157, 160, 43]},
+        {"kind": "rect", "color": 4, "box": [160, 157, 160, 43]},
+        {"kind": "rect", "color": 5, "box": [0, 155, 160, 4]},
+        {"kind": "rect", "color": 5, "box": [160, 155, 160, 4]},
+        {"kind": "strip", "color": 8, "rows": [[133, 143, 177], [155, 127, 193]]},
+        {"kind": "rect", "color": 9, "box": [141, 130, 38, 6]},
+        {"kind": "text", "color": 10, "position": [52, 174], "text": "ACTION TAKES CRYSTAL"}
+      ]
+    },
+    {
+      "id": 16011, "name": "THE QUIET GATE", "sky": 0,
+      "objects": [
+        {"kind": "strip", "color": 1, "rows": [[85, 94, 94], [145, 0, 188]]},
+        {"kind": "rect", "color": 4, "box": [0, 157, 160, 43]},
+        {"kind": "rect", "color": 4, "box": [160, 157, 160, 43]},
+        {"kind": "rect", "color": 5, "box": [0, 155, 160, 4]},
+        {"kind": "rect", "color": 5, "box": [160, 155, 160, 4]},
+        {"kind": "tree", "position": [33, 153], "size": 1},
+        {"kind": "rect", "color": 2, "box": [222, 57, 15, 99]},
+        {"kind": "rect", "color": 2, "box": [289, 57, 15, 99]},
+        {"kind": "rect", "color": 3, "box": [216, 52, 94, 10]},
+        {"kind": "rect", "color": 8, "box": [195, 128, 14, 26]},
+        {"kind": "rect", "color": 14, "box": [193, 122, 18, 9]},
+        {"kind": "text", "color": 10, "position": [52, 174], "text": "ACTION WAKES THE GATE"}
+      ]
+    }
+  ]
+}

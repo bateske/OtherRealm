@@ -1,0 +1,13 @@
+Signal Grove and the original Other Realm wordmark
+CC0 1.0 Universal
+
+To the extent possible under law, the authors have waived all copyright and
+related or neighboring rights to the original Signal Grove game content,
+including its JSON, procedural artwork, title image and generated game pack,
+and the original Other Realm wordmark artwork.
+
+These works are provided without warranty. This dedication does not apply to
+the engine or tools (see their source licenses), any third-party components,
+or any original Another World imagery or game resources.
+
+Full CC0 1.0 legal text: https://creativecommons.org/publicdomain/zero/1.0/legalcode
