@@ -14,4 +14,3 @@ inline uint8_t fontRow(uint8_t ch,uint8_t row){
     return (glyphs[ch-32]>>(row*3))&7;
 }
 }
-

@@ -11,11 +11,9 @@
   A 48 MHz RISC-V, 20 KB of RAM, and a 128 × 128 window into Another World.
 </p>
 
-[![Release](https://img.shields.io/github/v/release/bateske/Otherrealm?include_prereleases&color=d0ad62)](https://github.com/bateske/Otherrealm/releases)
-[![Platform](https://img.shields.io/badge/platform-CHGame-406fa0)](https://github.com/bateske/CHGame)
-[![Engine](https://img.shields.io/badge/engine-GPL--2.0--or--later-5c806b)](LICENSE)
-[![Flash](https://img.shields.io/badge/flash-33%2C808_B-405274)](#how-it-works)
-[![RAM](https://img.shields.io/badge/static_RAM-17%2C980_B-405274)](#how-it-works)
+[![Release](https://img.shields.io/github/v/release/bateske/Otherrealm?include_prereleases&color=d0ad62)](https://github.com/bateske/Otherrealm/releases) [![Platform](https://img.shields.io/badge/platform-CHGame-406fa0)](https://github.com/bateske/CHGame) [![Engine](https://img.shields.io/badge/engine-GPL--2.0--or--later-5c806b)](LICENSE)
+
+[![Flash](https://img.shields.io/badge/flash-33%2C808_B-405274)](#how-it-works) [![RAM](https://img.shields.io/badge/static_RAM-17%2C980_B-405274)](#how-it-works)
 
 <p>
   <a href="https://github.com/bateske/Otherrealm/releases"><strong>Download the engine & patcher »</strong></a><br><br>

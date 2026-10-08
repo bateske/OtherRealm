@@ -126,7 +126,7 @@ your own private pack; none is downloaded or bundled by CI.
 After building release firmware and checking out CHGame:
 
 ```powershell
-python -m pip install pillow pyinstaller ziglang
+python -m pip install -r tools/requirements-release.txt
 ./tools/build-release.ps1 -Python python
 ```
 

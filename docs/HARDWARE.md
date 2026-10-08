@@ -283,7 +283,92 @@ Host checks: 4,572 session assertions (including complete natural intro and
 skip), 13,752 renderer assertions, all nineteen original password/checkpoint
 comparisons, 2,314 flash journal checks, fourteen patcher tests, and browser
 movement/menu/persistence/title/skip/storage-failure integration checks.
-The original demo playthrough and official cartridge/card validation pass.## Version 0.3.1 presentation refinementsThe pause overlay now draws only text and its animated selector over the dimmedgame frame. Its selection strip and divider are removed. Dismissing the menustreams the undimmed frame and letterbox margins directly, without an interveningfull-panel black clear. All 16,384 pixels match the pre-pause image on the host,in the browser and in device scanout readback.The title uses the original greeting cinematic, reframed from the user's ownpolygon data with the foreground guard omitted to keep Lester's raised handvisible. The native OTHER REALM wordmark uses original angular black/goldletterforms. PRESS A BUTTON has no background strip and pulses white to sceneblue-gray over 7.68 seconds. No gameplay or input timing changed.Final device captures are in `build/device-test/ui-refinement/`. Title redrawmeasured 16,592 microseconds, the Continue menu 22,797 microseconds and the pauseoverlay 28,363 microseconds. Peak stack remained 1,008 of 2,048 bytes. Soundon/off still measured PWM 142/0. The 512-byte save journal was byte-identical tothe backup before the update, with zero save writes and no VM fault.Release: 31,704 bytes with 17,924 bytes static RAM. Debug: 35,588 bytes with18,376 static bytes. RAM is unchanged from 0.3. The card's private pack andlauncher passed read-back SHA-256 verification, and the final release wasaccepted and launched by the bootloader with image CRC32 `8193E98F`.- Release SHA-256: `88cb7089c058573e6c48d550ed111a5ffa0e31656263aa6959c9892d96785bfe`- SD launcher SHA-256: `141cb79b951499fcf4692f17048af6d015a5045900bc4ce5f57b9548352f0391`- Private pack SHA-256: `5797d84f660a28400181f05d81917f9f3c65a7599b2f5b0e294d5162a810def4`Checks passed: 21,218 session assertions, 13,752 renderer assertions, browsermovement/menu/persistence/intro/skip checks, a targeted white-blue-white pulseand exact-resume comparison, plus official cartridge/card conformance checks.The private background remains excluded from public game and source bundles.## Version 0.4 completion unlock and enchanted menusThe full 128×128 shoreline is again the default title. A second 8,224-byteresource holds the raised-hand greeting, selected only by the persistentcompletion bit. The card grows by 8,704 bytes including sector padding, to1,456,640 bytes. The existing pack identity and 44-byte save payload size stayunchanged. Completion is earned in the original final cinematic, survives newgames, and does not replace the last playable checkpoint with an ending scene.Menus have centered labels, no game-name heading, brighter selected text, aslow moving glint and falling motes. Selection sends motes upward while theother labels dissolve, then slides out; Sound emits particles without leavingor fading the options. The saved-status line scrolls left and A/B are brighterthan their labels. B on the main menu returns to the title without a save write.The particle cache is fourteen three-byte descriptors (42 bytes). Includingstate/alignment, release static RAM increases by 44 bytes to **17,968 bytes**,leaving 448 bytes below the separately reserved 2,048-byte stack. Debug uses18,396 static bytes after shrinking its command buffer from 48 to 24 bytes.Measured peak stack is 1,040 bytes, leaving 1,008 of the reserved stack unused.Release image: **33,316 bytes**. Debug image: **37,188 bytes**.The connected device measured title redraw at 17.072 ms, Continue at 30.456 ms,idle pause effects at 37.082–37.881 ms and confirmation at 41.140 ms. Idleparticles update on a 60 ms clock; confirmation carries fractional frame timeso display cost does not stretch the intended roughly 864 ms burst/slide.These are scanout measurements, not a 60 fps claim. No particle simulation runsduring gameplay.Device captures and profiles are in `build/device-test/magic-menu/`. Checksverified the title's full-panel pixels against the SD resource, B-to-title,Sound remaining open, the confirmation delay, and an exact pixel match afterresume. The 512-byte flash journal matched its pre-update backup byte for byte,with zero writes and no VM fault. Completion and new-game retention were testedon host/browser fixtures; the user's real save was not marked complete.Host checks: 20,792 session assertions, 154 checkpoint assertions including allnineteen original destinations, 13,752 renderer assertions, 2,314 journal checks,fifteen patcher tests, the original demo playthrough, browser integration anddeterministic menu/title captures. VM scheduling, malformed bytecode and allthree system-event checks also pass. The ordinary title is also used when acompleted pack has no alternate resource. Official cartridge/card checks pass.The final release is installed and running; the bootloader accepted CRC32`9B1AB0B8`. Both updated SD files passed read-back hash checks. Other card filesand menu indexes were preserved.- Release SHA-256: `fc2fbcd76a789a6025ab714192b8b261fb8978833e98c5105616eb301eadcd6e`- SD launcher SHA-256: `cd951e45ed29cd9c9f6f321adabbf9f6b36149663302df76d1931ee64e363aa2`- Private pack SHA-256: `f5c8bf5b05f4f0baa787b54aa004f194a580f05bad6de8ca6de7554aa1124e9e`
+The original demo playthrough and official cartridge/card validation pass.
+
+## Version 0.3.1 presentation refinements
+
+The pause overlay now draws only text and its animated selector over the dimmed
+game frame. Its selection strip and divider are removed. Dismissing the menu
+streams the undimmed frame and letterbox margins directly, without an intervening
+full-panel black clear. All 16,384 pixels match the pre-pause image on the host,
+in the browser and in device scanout readback.
+
+The title uses the original greeting cinematic, reframed from the user's own
+polygon data with the foreground guard omitted to keep Lester's raised hand
+visible. The native OTHER REALM wordmark uses original angular black/gold
+letterforms. PRESS A BUTTON has no background strip and pulses white to scene
+blue-gray over 7.68 seconds. No gameplay or input timing changed.
+
+Final device captures are in `build/device-test/ui-refinement/`. Title redraw
+measured 16,592 microseconds, the Continue menu 22,797 microseconds and the pause
+overlay 28,363 microseconds. Peak stack remained 1,008 of 2,048 bytes. Sound
+on/off still measured PWM 142/0. The 512-byte save journal was byte-identical to
+the backup before the update, with zero save writes and no VM fault.
+
+Release: 31,704 bytes with 17,924 bytes static RAM. Debug: 35,588 bytes with
+18,376 static bytes. RAM is unchanged from 0.3. The card's private pack and
+launcher passed read-back SHA-256 verification, and the final release was
+accepted and launched by the bootloader with image CRC32 `8193E98F`.
+
+- Release SHA-256: `88cb7089c058573e6c48d550ed111a5ffa0e31656263aa6959c9892d96785bfe`
+- SD launcher SHA-256: `141cb79b951499fcf4692f17048af6d015a5045900bc4ce5f57b9548352f0391`
+- Private pack SHA-256: `5797d84f660a28400181f05d81917f9f3c65a7599b2f5b0e294d5162a810def4`
+
+Checks passed: 21,218 session assertions, 13,752 renderer assertions, browser
+movement/menu/persistence/intro/skip checks, a targeted white-blue-white pulse
+and exact-resume comparison, plus official cartridge/card conformance checks.
+The private background remains excluded from public game and source bundles.
+
+## Version 0.4 completion unlock and enchanted menus
+
+The full 128×128 shoreline is again the default title. A second 8,224-byte
+resource holds the raised-hand greeting, selected only by the persistent
+completion bit. The card grows by 8,704 bytes including sector padding, to
+1,456,640 bytes. The existing pack identity and 44-byte save payload size stay
+unchanged. Completion is earned in the original final cinematic, survives new
+games, and does not replace the last playable checkpoint with an ending scene.
+
+Menus have centered labels, no game-name heading, brighter selected text, a
+slow moving glint and falling motes. Selection sends motes upward while the
+other labels dissolve, then slides out; Sound emits particles without leaving
+or fading the options. The saved-status line scrolls left and A/B are brighter
+than their labels. B on the main menu returns to the title without a save write.
+
+The particle cache is fourteen three-byte descriptors (42 bytes). Including
+state/alignment, release static RAM increases by 44 bytes to **17,968 bytes**,
+leaving 448 bytes below the separately reserved 2,048-byte stack. Debug uses
+18,396 static bytes after shrinking its command buffer from 48 to 24 bytes.
+Measured peak stack is 1,040 bytes, leaving 1,008 of the reserved stack unused.
+Release image: **33,316 bytes**. Debug image: **37,188 bytes**.
+
+The connected device measured title redraw at 17.072 ms, Continue at 30.456 ms,
+idle pause effects at 37.082–37.881 ms and confirmation at 41.140 ms. Idle
+particles update on a 60 ms clock; confirmation carries fractional frame time
+so display cost does not stretch the intended roughly 864 ms burst/slide.
+These are scanout measurements, not a 60 fps claim. No particle simulation runs
+during gameplay.
+
+Device captures and profiles are in `build/device-test/magic-menu/`. Checks
+verified the title's full-panel pixels against the SD resource, B-to-title,
+Sound remaining open, the confirmation delay, and an exact pixel match after
+resume. The 512-byte flash journal matched its pre-update backup byte for byte,
+with zero writes and no VM fault. Completion and new-game retention were tested
+on host/browser fixtures; the user's real save was not marked complete.
+
+Host checks: 20,792 session assertions, 154 checkpoint assertions including all
+nineteen original destinations, 13,752 renderer assertions, 2,314 journal checks,
+fifteen patcher tests, the original demo playthrough, browser integration and
+deterministic menu/title captures. VM scheduling, malformed bytecode and all
+three system-event checks also pass. The ordinary title is also used when a
+completed pack has no alternate resource. Official cartridge/card checks pass.
+
+The final release is installed and running; the bootloader accepted CRC32
+`9B1AB0B8`. Both updated SD files passed read-back hash checks. Other card files
+and menu indexes were preserved.
+
+- Release SHA-256: `fc2fbcd76a789a6025ab714192b8b261fb8978833e98c5105616eb301eadcd6e`
+- SD launcher SHA-256: `cd951e45ed29cd9c9f6f321adabbf9f6b36149663302df76d1931ee64e363aa2`
+- Private pack SHA-256: `f5c8bf5b05f4f0baa787b54aa004f194a580f05bad6de8ca6de7554aa1124e9e`
 
 ## Version 0.4.1 stationary fades, standing title and Start hold
 
@@ -351,4 +436,3 @@ not change; only the launcher cartridge on SD is updated.
 
 The SD cartridge passed readback verification. The release is installed and
 running, accepted by the bootloader with image CRC32 73550E05.
-

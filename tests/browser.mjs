@@ -46,4 +46,3 @@ try{
  assert.equal(await denied.evaluate(()=>mod._or_save_failed()),1);await denied.close();
  assert.deepEqual(errors,[]);console.log('PASS browser: movement, Start menu, paused VM, persistent reload/continue, title on every boot, intro/skip, private adapted pack, new-game confirmation, storage failure notice, responsive layout, no errors.');
 }catch(e){console.error('UI status:',await page.locator('#status').textContent());console.error('Browser errors:',errors);await page.screenshot({path:'build/browser-failure.png'});throw e;}finally{await browser.close()}
-

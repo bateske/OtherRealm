@@ -27,7 +27,8 @@ try {
     & $Python @bundleArgs > build/release-work/pyinstaller.log 2>&1
     if($LASTEXITCODE){throw 'Patcher bundle failed: build/release-work/pyinstaller.log'}
     Copy-Item tools/Upload-Cartridge.ps1 build/release/Otherrealm-Patcher/Upload-Cartridge.ps1
-    Copy-Item docs/INSTALL.md build/release/Otherrealm-Patcher/INSTALL.md
+    $installGuide=Get-Content docs/INSTALL.md -Raw -Encoding utf8
+    $installGuide.Replace('(../BUILDING.md)','(https://github.com/bateske/Otherrealm/blob/main/BUILDING.md)') | Set-Content -Encoding utf8 build/release/Otherrealm-Patcher/INSTALL.md
     & $Python tools/bundle_notices.py build/release/Otherrealm-Patcher
     if($LASTEXITCODE){throw 'Dependency notice collection failed.'}
     Write-Output 'Built standalone patcher: build/release/Otherrealm-Patcher/Otherrealm-Patcher.exe'

@@ -60,7 +60,7 @@ def make_cover() -> bytes:
     draw.line((57, 50, 57, 63), fill=colors[10], width=2)
     ink = (255, 244, 214)
     put = lambda x, y, color: draw.point((x, y), fill=color)
-    background.text(put, 34, 10, "OTHERREALM", ink)
+    background.text(put, 31, 10, "OTHER REALM", ink)
     background.text(put, 28, 23, "SIGNAL GROVE", ink)
     background.text(put, 16, 102, "VECTOR ADVENTURE", ink)
     out = io.BytesIO()
@@ -111,9 +111,10 @@ def package(binary: Path, output: Path, version: str, date: str, check_fixtures:
         "No Another World disk images, extracted resources, or private packs are included.\n"
     ).encode("utf8")
     game = model.Game(
-        id="otherrealm", title="OTHERREALM", version=version, author="Otherrealm",
+        id="otherrealm", title="OTHER REALM", version=version, author="bateske",
         description="Signal Grove: a three-room vector adventure streamed from SD.",
         genre="Adventure", license="GPL-3.0-or-later", binaries={"rev0": firmware},
+        sourceUrl="https://github.com/bateske/Otherrealm",url="https://github.com/bateske/Otherrealm",
         license_files=licenses, sd={"OTHERWRL.PAK": demo}, cart_image=cover,
         buttons=[("D-pad", "Move; Up jumps"), ("A", "Interact / collect / unlock"),
                  ("B", "Jump / menu back"), ("SELECT", "Menu"), ("START", "Pause / system menu")],
@@ -187,7 +188,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, default=ROOT / "build/device/release/Otherrealm.ino.bin")
     parser.add_argument("--output", type=Path, default=ROOT / "build/dist")
-    parser.add_argument("--version", default="0.4.2")
+    parser.add_argument("--version", default="0.5.0")
     parser.add_argument("--date", default="2026-10-08")
     parser.add_argument("--check-fixtures", action="store_true", help="also check all official CHGame conformance fixtures")
     args = parser.parse_args()

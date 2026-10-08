@@ -17,7 +17,7 @@ def main():
     for folder, patterns in {
         "engine": ("*.cpp", "*.h"),
         "firmware/Otherrealm": ("*.cpp", "*.h", "*.ino", "*.txt"),
-        "tools": ("*.py", "*.ps1", "*.md", "*.cpp"),
+        "tools": ("*.py", "*.ps1", "*.md", "*.cpp", "requirements-release.txt"),
         "tools/licenses": ("*.txt",),
         "tests": ("*.cpp", "*.mjs", "*.py"),
         "tests/replays": ("*.csv",),

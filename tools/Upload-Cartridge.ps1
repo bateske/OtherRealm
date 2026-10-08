@@ -23,9 +23,9 @@ if(Test-Path -LiteralPath $app){
 }
 $binary=Join-Path $extract 'Otherrealm.bin'
 if(!(Test-Path -LiteralPath $binary)){throw 'Validated firmware was not produced.'}
-$arguments=@('-device','rev0')
+$arguments=@()
 if($Port){$arguments+=@('-port',$Port)}
-$arguments+=@('flash',$binary,'-verify','-run')
+$arguments+=@('flash',$binary,'-device','rev0','-verify','-run')
 & $uploader @arguments
 if($LASTEXITCODE){throw 'Upload failed. Close serial monitors and check the selected port.'}
 Write-Output 'Other Realm is running. The SD card must contain OTHERWRL.PAK.'

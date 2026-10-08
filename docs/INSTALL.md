@@ -67,7 +67,7 @@ game application; it does not replace your bootloader.
 Alternatively, after copying the SD data, run the installed uploader directly:
 
 ```powershell
-chgame-upload -port COM8 -device rev0 flash Otherrealm.bin -verify -run
+chgame-upload -port COM8 flash Otherrealm.bin -device rev0 -verify -run
 ```
 
 `chgame-upload` may not be on PATH; the helper handles its Boards Manager location.
