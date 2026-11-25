@@ -96,14 +96,16 @@ be released before showing its restart prompt; holding action continuously can
 leave that sequence on a black frame. This was confirmed against the supplied
 script, rather than treated as an engine crash.
 
-The redistributable Signal Grove demo has a complete tested route: collect the
+The historical Signal Grove demo has a complete tested route: collect the
 crystal, unlock the gate, reach victory, and restart with cleared inventory and
 gate state. A separate test tries the gate without the crystal and confirms that
-it blocks movement. `tests/demo_tests.cpp` exercises these conditions using only
-VM input. The independent fixed-input replay also reaches victory and restarts:
+it blocks movement. These were exercised by the original demo test using only
+VM input. The current default and `tests/demo_tests.cpp` cover First Contact;
+build the retained Signal Grove fixture explicitly for its independent replay:
 
 ```powershell
-node build/probe.js demo/sd/OTHERWRL.PAK 250 16001 tests/replays/signal-grove-win.csv
+python tools/build_demo.py --source demo/signal-grove.json --output build/signal-grove/OTHERWRL.PAK
+node build/probe.js build/signal-grove/OTHERWRL.PAK 250 16001 tests/replays/signal-grove-win.csv
 ```
 
 Replay CSV rows are `exclusive_end_tick,direction_mask,action`; direction bits

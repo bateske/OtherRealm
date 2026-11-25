@@ -10,7 +10,7 @@ try {
         & $Python -m ziglang c++ @core tools/capture_title.cpp -DOR_WIDTH=208 -std=c++11 -O2 -static -w -o build/capture_title.exe > build/release-work/native.log 2>&1
         if($LASTEXITCODE){throw 'Native renderer build failed: build/release-work/native.log'}
     }
-    if(!(Test-Path build/device/release/Otherrealm.ino.bin)){throw 'Build device release firmware first.'}
+    if(!(Test-Path build/device/rev0/release/Otherrealm.ino.bin)){throw 'Build device release firmware first.'}
     $bundleArgs=@('-m','PyInstaller','--noconfirm','--onedir','--windowed','--name','Otherrealm-Patcher',
         '--distpath','build/release','--workpath','build/release-work/pyinstaller','--specpath','build/release-work',
         '--paths','tools','--paths','CHGame/tools',
@@ -18,8 +18,12 @@ try {
         '--add-data',((Join-Path $root 'assets/title.png')+':assets'),
         '--add-data',((Join-Path $root 'LICENSE')+':.'),'--add-data',((Join-Path $root 'THIRD_PARTY.md')+':.'))
     # Keep the firmware's public name independent of Arduino's sketch naming.
-    Copy-Item build/device/release/Otherrealm.ino.bin build/release-work/Otherrealm.bin
-    $bundleArgs+=@('--add-data',((Join-Path $root 'build/release-work/Otherrealm.bin')+':firmware'))
+    foreach($revision in @('rev0','rev1')){
+        $firmware=Join-Path $root "build/device/$revision/release/Otherrealm.ino.bin"
+        $staged=Join-Path $root "build/release-work/Otherrealm-$revision.bin"
+        Copy-Item -LiteralPath $firmware -Destination $staged
+        $bundleArgs+=@('--add-data',($staged+':firmware'))
+    }
     foreach($file in Get-ChildItem firmware/Otherrealm -Filter '*.txt'){
         $bundleArgs+=@('--add-data',($file.FullName+':firmware/Otherrealm'))
     }

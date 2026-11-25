@@ -2,6 +2,13 @@
 
 Validated on Windows and the connected CHGame Rev0 on 2026-10-08.
 
+This page preserves the 0.5.0 preview's historical results. The current default
+public pack is **First Contact**, a playable setup guide, replacing Signal Grove.
+On 2026-11-24, the Amiga pair included in the local Steam installation under
+`Bonus/rom Amiga/` was confirmed identical to the development pair and passed a
+complete personal cartridge conversion. The patcher now discovers that folder
+from the Steam game's installation root. See [current installation steps](INSTALL.md).
+
 ## Personal cartridge workflow
 
 The source CLI and the frozen Windows application independently converted the
@@ -48,8 +55,18 @@ runtime profiling and [media provenance](MEDIA.md) for the gameplay GIF.
 
 ## Explicit release boundary
 
-This is an **Amiga-compatible preview**. A local Steam 20th Anniversary install
-was not available for conversion testing. Its DAT/BGZ/TXT layout is documented,
-but this release does not claim to import it. The full original game has not
+At the time of the October preview, a local Steam 20th Anniversary install was
+not available for conversion testing. The November validation above uses its
+included Amiga disks, not its anniversary DAT/BGZ/TXT resources. The full original game has not
 been played through end to end; tested coverage is detailed in
 [PERFORMANCE.md](PERFORMANCE.md). No playable commercial game data is distributed.
+
+## Rev 0 + Rev 1 preview (0.5.1)
+
+Built with CHGame board package 0.4.1 and tooling 921c348. The public cartridge
+lists both device binaries; each is validated through its matching CHG target,
+firmware payload comparison, and prepared-card backup round trip. Rev 1 display,
+buttons, SD and audio use its pin assignments; the magnetic buzzer uses the
+upstream TIM2 implementation with a forced-low silent state. No Rev 1 physical
+handheld playthrough is claimed. Separate raw binaries and SD ZIPs accompany
+the combined cartridge. The Windows patcher embeds both revisions.

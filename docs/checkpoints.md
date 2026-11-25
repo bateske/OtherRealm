@@ -24,8 +24,10 @@ records. The two-page CRC/atomic replacement protocol is unchanged.
 
 The original game's noninteractive final part 16007 earns completion after its
 first successful tick, preserving the last playable checkpoint. Authored packs
-emit system event 3 on victory; Signal Grove does this when exiting its final
-gate. Entering a menu or a password screen never earns completion. This flag
+emit system event 3 on completion; First Contact does this at the end of its
+walkthrough. The retained Signal Grove example emits it at its final gate.
+Guide completion records reading progress, not a real installation. Entering
+a menu or a password screen never earns completion. This flag
 selects an optional unlocked title resource and is written only when first
 earned or alongside a changed checkpoint.
 
@@ -83,9 +85,10 @@ same-scene event changes. The part plus marker determines whether progress
 changed; walking coordinates and animation timers do not cause repeated
 storage writes.
 
-Scene initialization must respect the restored variables. Signal Grove uses
-variable `0F` as an initialization guard, preserves its crystal and gate state,
-and increments `E0` for pickups, unlocking, room changes and victory. A new
+Scene initialization must respect the restored variables. First Contact uses
+variable `0F` as an initialization guard and preserves completed station state.
+It increments `E0` at progress milestones and room changes. The retained Signal
+Grove example uses the same contract for its crystal, gate, and victory. A new
 scene must complete at least one VM tick before capture, preventing inherited
 entry variables from being saved before the new script initializes them.
 

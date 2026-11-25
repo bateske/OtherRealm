@@ -28,6 +28,13 @@ static void step(Game &game,uint8_t direction=0,bool action=false){
 }
 static void go(Game &game,uint16_t part){for(unsigned i=0;i<200&&game.part!=part;++i)step(game,VmInput::Right);check(game.part==part,"reach next authored scene");}
 static void x(Game &game,int target){for(unsigned i=0;i<100&&abs(game.vm.variable(0)-target)>3;++i)step(game,game.vm.variable(0)<target?VmInput::Right:VmInput::Left);check(abs(game.vm.variable(0)-target)<=3,"reach authored interaction");}
+static void action(Game &game){step(game);step(game,0,true);step(game);}
+static void readStation(Game &game,unsigned pages){
+    const int stage=game.vm.variable(3);x(game,215);action(game);
+    check(game.vm.variable(4)==1&&game.vm.variable(7)==1,"station opens its first instruction page");
+    for(unsigned i=0;i<pages;++i)action(game);
+    check(!game.vm.variable(4)&&game.vm.variable(3)==stage+1,"reading station earns next stage");
+}
 static CheckpointValue amiga(unsigned part,int position){CheckpointValue value={};value.kind=CheckpointAmiga;value.part=part;value.variables[0]=position;return value;}
 
 static void testCodec(){
@@ -55,26 +62,37 @@ static void testCodec(){
     check(!validCheckpoint(amiga(16003,21))&&!validCheckpoint(amiga(16006,64)),"exclude non-password or later-release selectors");
 }
 
-static void testDemo(const char *path){
+static void testGuide(const char *path){
     FileDevice device(path);Game game(device);CheckpointValue saved={},moved={},restored={};
-    check(game.begin(16001),"begin custom demo");
+    check(game.begin(16001),"begin setup guide");
     check(!captureCheckpoint(game,saved),"do not save uninitialized entry variables");step(game);
-    check(captureCheckpoint(game,saved)&&saved.marker==1,"authored initial milestone");
-    step(game,VmInput::Right);check(captureCheckpoint(game,moved)&&sameCheckpoint(saved,moved),"walking does not cause autosave spam");
-    go(game,16010);check(!captureCheckpoint(game,moved),"defer save until new scene executes once");step(game);
-    x(game,160);step(game,0,true);step(game);
-    check(captureCheckpoint(game,saved)&&saved.variables[3]==1,"crystal earns same-scene checkpoint");
-    check(resumeCheckpoint(game,saved),"resume crystal checkpoint");
-    check(game.vm.variable(3)==1&&game.vm.variable(15)==1&&game.vm.variable(CheckpointMarkerVariable)==int16_t(saved.marker),"restore inventory init guard and authored marker");
-    step(game);check(game.vm.variable(3)==1&&game.part==16010,"scene init does not clear resumed inventory");
+    check(captureCheckpoint(game,saved)&&saved.marker==1&&saved.variables[4]==1&&saved.variables[7]==0,"initial instruction page is a saveable milestone");
+    step(game,VmInput::Right);check(game.vm.variable(0)==saved.variables[0]&&captureCheckpoint(game,moved)&&sameCheckpoint(saved,moved),"movement is blocked while reading without extra save milestones");
+    action(game);check(captureCheckpoint(game,saved)&&saved.variables[4]==2,"advancing intro earns a page checkpoint");
+    check(resumeCheckpoint(game,saved),"resume midway through introduction");step(game);
+    check(game.vm.variable(4)==2&&game.vm.variable(7)==0,"intro resumes on the exact instruction page");
+    action(game);action(game);check(!game.vm.variable(4),"finish resumed intro");
+    check(captureCheckpoint(game,saved),"capture free movement state");
+    step(game,VmInput::Right);check(captureCheckpoint(game,moved)&&sameCheckpoint(saved,moved)&&moved.variables[0]>saved.variables[0],"walking does not cause autosave spam");
+    x(game,215);action(game);action(game);
+    check(captureCheckpoint(game,saved)&&saved.variables[3]==0&&saved.variables[4]==2&&saved.variables[7]==1,"station page checkpoint does not complete the station early");
+    check(resumeCheckpoint(game,saved),"resume station instructions");
+    check(game.vm.variable(15)==1&&game.vm.variable(CheckpointMarkerVariable)==int16_t(saved.marker),"restore init guard and authored marker");
+    step(game);check(game.vm.variable(3)==0&&game.vm.variable(4)==2&&game.part==16001,"scene init preserves resumed page and stage");
     check(captureCheckpoint(game,restored)&&sameCheckpoint(saved,restored),"resuming does not generate duplicate milestone");
-    go(game,16011);step(game);x(game,202);step(game,0,true);step(game);
-    check(captureCheckpoint(game,saved)&&saved.variables[4]==1,"unlocked gate earns checkpoint");
-    check(resumeCheckpoint(game,saved),"resume unlocked gate");step(game);
-    check(game.vm.variable(3)==1&&game.vm.variable(4)==1,"gate and inventory survive fresh VM initialization");
+    action(game);check(captureCheckpoint(game,saved)&&saved.variables[3]==1&&saved.variables[4]==0,"closing final station page saves completed stage");
+    go(game,16010);check(!captureCheckpoint(game,moved),"defer save until new scene executes once");step(game);
+    readStation(game,3);
+    const uint16_t parts[]={16011,16012,16013};
+    for(unsigned i=0;i<3;++i){go(game,parts[i]);step(game);readStation(game,4);}
+    check(captureCheckpoint(game,saved)&&saved.variables[3]==5&&!saved.variables[6],"all five stages saved before ending");
+    check(resumeCheckpoint(game,saved),"resume completed dock");step(game);
     for(unsigned i=0;i<50&&!game.vm.variable(6);++i)step(game,VmInput::Right);
-    check(game.vm.variable(6)==1&&captureCheckpoint(game,saved),"resumed gate remains playable to victory");
-    check(resumeCheckpoint(game,saved),"resume custom ending");step(game);check(game.vm.variable(6)==1,"custom ending state retained");
+    check(game.vm.variable(6)==1&&captureCheckpoint(game,saved)&&saved.variables[4]==1&&saved.variables[7]==2,"resumed dock reaches a saveable ending page");
+    action(game);check(captureCheckpoint(game,saved)&&saved.variables[4]==2,"ending second page has its own checkpoint");
+    check(resumeCheckpoint(game,saved),"resume guide ending");step(game);
+    check(game.vm.variable(6)==1&&game.vm.variable(3)==5&&game.vm.variable(4)==2&&game.vm.variable(7)==2,"ending page and completed stages survive restart");
+    action(game);check(game.part==16013&&game.vm.variable(0)==270&&!game.vm.variable(4)&&game.vm.variable(6)==1,"closing ending returns to dock without resetting progress");
 }
 
 struct PasswordBinding{uint16_t part,position;uint8_t characters[4];};
@@ -123,7 +141,7 @@ static void testPrivatePasswords(const char *path){
 }
 
 int main(int argc,char **argv){
-    testCodec();testDemo(argc>1?argv[1]:"demo/sd/OTHERWRL.PAK");
+    testCodec();testGuide(argc>1?argv[1]:"demo/sd/OTHERWRL.PAK");
     if(argc>2)testPrivatePasswords(argv[2]);
-    printf("Checkpoint PASS: %u checks, semantic saves and scene inventory resume.\n",checks);return 0;
+    printf("Checkpoint PASS: %u checks, semantic saves, guide pages, stages and ending resume.\n",checks);return 0;
 }

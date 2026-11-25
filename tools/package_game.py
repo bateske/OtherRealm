@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Package the release firmware and original Signal Grove demo using CHGame's helpers.
+"""Package the release firmware and original First Contact setup guide.
 
 This does not connect to hardware. It rebuilds the original demo from its JSON,
 never reads private/ or ADF files, and writes only to a project-local output folder.
@@ -34,35 +34,31 @@ def sha256(data: bytes) -> str:
 
 
 def make_cover() -> bytes:
-    """An original geometric cover using Signal Grove's authored palette."""
+    """An original workstation/card cover, readable on the handheld launcher."""
     from PIL import Image, ImageDraw
-    design = json.loads((ROOT / "demo/signal-grove.json").read_text(encoding="utf8"))
+    design = json.loads((ROOT / "demo/first-contact.json").read_text(encoding="utf8"))
     colors = ["#" + value for value in design["palette"]]
     image = Image.new("RGB", (128, 128), colors[0])
     draw = ImageDraw.Draw(image)
-    draw.polygon([(0, 73), (26, 41), (71, 90), (0, 99)], fill=colors[1])
-    draw.polygon([(47, 87), (79, 52), (127, 96)], fill=colors[2])
-    draw.rectangle((0, 91, 127, 127), fill=colors[4])
-    draw.rectangle((0, 91, 127, 94), fill=colors[5])
-    for x in (9, 24):
-        draw.rectangle((x, 54, x + 3, 91), fill=colors[8])
-        draw.polygon([(x + 1, 38), (x - 8, 67), (x + 11, 67)], fill=colors[5])
-        draw.polygon([(x + 1, 53), (x - 10, 80), (x + 13, 80)], fill=colors[4])
-    draw.rectangle((85, 47, 93, 93), fill=colors[2])
-    draw.rectangle((111, 47, 119, 93), fill=colors[2])
-    draw.rectangle((86, 43, 118, 50), fill=colors[3])
-    draw.line((96, 53, 96, 88), fill=colors[14], width=2)
-    draw.line((102, 53, 102, 88), fill=colors[14], width=2)
-    draw.line((108, 53, 108, 88), fill=colors[14], width=2)
-    draw.polygon([(52, 70), (63, 70), (70, 93), (45, 93)], fill=colors[8])
-    draw.rectangle((48, 68, 67, 72), fill=colors[9])
-    draw.polygon([(57, 48), (65, 58), (57, 67), (50, 58)], fill=colors[14])
-    draw.line((57, 50, 57, 63), fill=colors[10], width=2)
+    draw.polygon([(0, 77), (22, 59), (53, 83), (79, 53), (127, 83), (127, 100), (0, 100)], fill=colors[1])
+    draw.rectangle((12, 42, 78, 84), fill="#d7b36a")
+    draw.rectangle((16, 46, 74, 79), fill="#101f31")
+    draw.line((24, 56, 31, 61, 24, 66), fill="#83d1bd", width=2)
+    draw.line((37, 68, 54, 68), fill="#83d1bd", width=2)
+    draw.rectangle((41, 85, 49, 90), fill="#d7b36a")
+    draw.rectangle((30, 91, 60, 93), fill="#d7b36a")
+    draw.line((80, 67, 91, 67), fill="#f5e8c8", width=2)
+    draw.polygon([(88, 63), (94, 67), (88, 71)], fill="#f5e8c8")
+    draw.polygon([(100, 50), (112, 50), (120, 58), (120, 88), (100, 88)], fill="#83d1bd")
+    for x in (103, 108, 113):
+        draw.rectangle((x, 55, x + 2, 62), fill="#101f31")
+    draw.rectangle((103, 69, 116, 80), fill="#101f31")
+    draw.rectangle((0, 100, 127, 127), fill="#d7b36a")
     ink = (255, 244, 214)
     put = lambda x, y, color: draw.point((x, y), fill=color)
     background.text(put, 31, 10, "OTHER REALM", ink)
-    background.text(put, 28, 23, "SIGNAL GROVE", ink)
-    background.text(put, 16, 102, "VECTOR ADVENTURE", ink)
+    background.text(put, 25, 23, "FIRST CONTACT", ink)
+    background.text(put, 34, 110, "SETUP GUIDE", (16, 31, 49))
     out = io.BytesIO()
     image.save(out, "PNG", optimize=True)
     converted, _ = picture.convert(out.getvalue())
@@ -81,9 +77,11 @@ def package(binary: Path, output: Path, version: str, date: str, check_fixtures:
         problems = fixtures.check(log=lambda value: None)
         if problems:
             raise ValueError(f"official CHGame conformance fixtures failed: {problems}")
-    firmware = binary.read_bytes()
+    firmwares = {rev: (ROOT / f'build/device/{rev}/release/Otherrealm.ino.bin').read_bytes() for rev in ('rev0','rev1')}
+    if binary is not None: firmwares['rev0'] = binary.read_bytes()
+    firmware = firmwares['rev0']
     generated_pack = output / "generated" / "OTHERWRL.PAK"
-    build_demo(ROOT / "demo/signal-grove.json", generated_pack)
+    build_demo(ROOT / "demo/first-contact.json", generated_pack)
     pack_info = verify_pack(generated_pack)
     demo = generated_pack.read_bytes()
     cover = make_cover()
@@ -101,7 +99,7 @@ def package(binary: Path, output: Path, version: str, date: str, check_fixtures:
     if (ROOT / "THIRD_PARTY.md").is_file():
         licenses["THIRD_PARTY.md"] = (ROOT / "THIRD_PARTY.md").read_bytes()
     licenses["ASSETS.txt"] = (
-        "Signal Grove's authored JSON, procedural art, generated demo assets, and\n"
+        "First Contact's authored JSON, prose, procedural art, generated guide assets, and\n"
         "the original cover geometry are dedicated to the public domain under CC0-1.0.\n"
         "The engine and authoring tools are GPL-2.0-or-later; see LICENSE.\n"
         "The combined device firmware uses GPL-3.0-or-later (DEVICE-GPL3),\n"
@@ -112,16 +110,16 @@ def package(binary: Path, output: Path, version: str, date: str, check_fixtures:
     ).encode("utf8")
     game = model.Game(
         id="otherrealm", title="OTHER REALM", version=version, author="bateske",
-        description="Signal Grove: a three-room vector adventure streamed from SD.",
-        genre="Adventure", license="GPL-3.0-or-later", binaries={"rev0": firmware},
+        description="First Contact: a playable setup guide for bringing your Another World copy to CHGame.",
+        genre="Adventure", license="GPL-3.0-or-later", binaries=firmwares,
         sourceUrl="https://github.com/bateske/Otherrealm",url="https://github.com/bateske/Otherrealm",
         license_files=licenses, sd={"OTHERWRL.PAK": demo}, cart_image=cover,
-        buttons=[("D-pad", "Move; Up jumps"), ("A", "Interact / collect / unlock"),
+        buttons=[("D-pad", "Move; Up jumps"), ("A", "Read station / next page"),
                  ("B", "Jump / menu back"), ("SELECT", "Menu"), ("START", "Pause / system menu")],
     )
-    cart = model.Cart(title="Otherrealm: Signal Grove", games=[game], version=version,
+    cart = model.Cart(title="Other Realm", games=[game], version=version,
                       author="Otherrealm", date=date, license="GPL-3.0-or-later", cover=cover,
-                      description="Otherrealm vector engine with the original Signal Grove demo.")
+                      description="Five-room setup adventure. Buy, find the Amiga disks, build, and copy to SD. Another World not included.")
     issues = model.validate(cart)
     if issues:
         raise ValueError("\n".join(map(str, issues)))
@@ -131,6 +129,17 @@ def package(binary: Path, output: Path, version: str, date: str, check_fixtures:
     loaded = zipio.load(archive, roundtrip_issues)
     if roundtrip_issues or zipio.to_bytes(loaded) != archive:
         raise ValueError("official .chgame round-trip verification failed")
+    for revision, image in firmwares.items():
+        prepared = runtime.prepare(loaded, revision)
+        chg = next(value for name,value in prepared.items() if name.endswith('.CHG'))
+        parsed = chgpack.parse(chg, target=chgpack.target_of(revision))
+        if chg[512:512+parsed['payload_bytes']] != chgpack.pad_image(image):
+            raise ValueError(f'{revision} firmware mismatch')
+        restored, issues = backup.backup(prepared, title=cart.title, device=revision)
+        if issues or runtime.prepare(restored, revision) != prepared:
+            raise ValueError(f'{revision} backup mismatch')
+        (output / f'Otherrealm-{revision}.bin').write_bytes(image)
+        (output / f'Otherrealm-SD-{revision}.zip').write_bytes(backup.card_zip(prepared))
     card = runtime.prepare(loaded, "rev0")
     chg_paths = [name for name in card if name.endswith(".CHG")]
     if len(chg_paths) != 1 or card.get("OTHERWRL.PAK") != demo:
@@ -151,10 +160,11 @@ def package(binary: Path, output: Path, version: str, date: str, check_fixtures:
     (output / "Otherrealm-SD.zip").write_bytes(backup.card_zip(card))
     files, manifest = zipio.read(archive)
     report = {
-        "format": "CHGame schemaVersion 1 / prepared card v2", "device": "rev0",
+        "format": "CHGame schemaVersion 1 / prepared card v2", "devices": list(firmwares),
         "cart": {"file": cart_path.name, "bytes": len(archive), "sha256": sha256(archive)},
-        "firmware": {"file": str(binary.relative_to(ROOT) if ROOT in binary.parents else binary),
+        "firmware": {"file": "Otherrealm-rev0.bin",
                      "bytes": len(firmware), "sha256": sha256(firmware)},
+        "binaries": {rev: {"bytes": len(data), "sha256": sha256(data)} for rev,data in firmwares.items()},
         "demo": pack_info,
         "checks": {"official_fixtures": "passed" if check_fixtures else "not requested",
                    "cart_roundtrip": "byte-identical", "card_backup_roundtrip": "byte-identical",
@@ -165,19 +175,30 @@ def package(binary: Path, output: Path, version: str, date: str, check_fixtures:
     }
     (output / "package-report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf8")
     (output / "README.txt").write_text(
-        "OTHERREALM / SIGNAL GROVE\n\n"
-        "Otherrealm.chgame is the standard CHGame Rev0 cart: release firmware,\n"
-        "original demo, metadata, cover, and licenses. Import it with CHGame tools.\n"
-        "Otherrealm-SD.zip and sdcard/ are the equivalent prepared single-game\n"
+        "OTHER REALM / FIRST CONTACT SETUP GUIDE\n\n"
+        "Otherrealm.chgame is a CHGame Rev0 + Rev1 cartridge: firmware,\n"
+        "original guide, metadata, cover, and licenses. Import it with CHGame tools.\n"
+        "Otherrealm-SD-rev0.zip / Otherrealm-SD-rev1.zip match each board.\n"
+        "Otherrealm-SD.zip and sdcard/ are the Rev0 prepared single-game\n"
         "card layout. Copy their contents to a FAT16/FAT32 card's root, then select\n"
-        "OTHERREALM in its bootloader menu. Import the cart into an existing\n"
+        "OTHER REALM in its bootloader menu. Import the cart into an existing\n"
         "multi-game collection to preserve that collection's menu entries.\n\n"
-        "D-pad: move; Up/B: jump; A: interact; START/SELECT: system menu.\n"
+        "Left/Right: move; Up/B: jump; A: read / next page; START/SELECT: menu.\n"
         "Menu: Up/Down select, A confirm, B back. Progress autosaves at milestones.\n"
-        "Collect the crystal in the shrine, take it right to unlock the gate,\n"
-        "then walk through. Press A after victory to play again. Sound toggles in the menu.\n\n"
-        "This bundle contains only the original Signal Grove demo. Personal\n"
-        "Another World resources remain separate in private/.\n"
+        "Read each station to open the path: arrival, terminal, archive, workshop,\n"
+        "card dock. Walk back to reread. Playing is only a rehearsal: it cannot\n"
+        "purchase, download, convert, or install files. Complete those steps on a PC.\n\n"
+        "Buy/install Another World - 20th Anniversary Edition on Steam (app 233550).\n"
+        "Manage > Browse local files opens its installation. Bonus/rom Amiga holds\n"
+        "the two supported ADF disks. Open Otherrealm-Patcher.exe, choose the Steam\n"
+        "game folder and a new empty output folder, then Build my cartridge.\n"
+        "After all five steps pass, choose sdcard-rev0 or sdcard-rev1 for your board.\n"
+        "Copy its CONTENTS to your\n"
+        "card root: OTHERWRL.PAK and GAMES/OTHERREA.CHG. Safely eject, insert into\n"
+        "CHGame, and choose OTHER REALM. Import the generated Otherrealm.chgame with\n"
+        "CHGame tools when adding it to an existing multi-game collection.\n\n"
+        "This public bundle contains only the original First Contact guide.\n"
+        "Another World data is supplied by you and stays in your personal output.\n"
         "package-report.json records firmware/data hashes and official validation.\n",
         encoding="utf8",
     )
@@ -186,14 +207,14 @@ def package(binary: Path, output: Path, version: str, date: str, check_fixtures:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--binary", type=Path, default=ROOT / "build/device/release/Otherrealm.ino.bin")
+    parser.add_argument("--binary", type=Path, default=None)
     parser.add_argument("--output", type=Path, default=ROOT / "build/dist")
-    parser.add_argument("--version", default="0.5.0")
-    parser.add_argument("--date", default="2026-10-08")
+    parser.add_argument("--version", default="0.5.1")
+    parser.add_argument("--date", default="2026-11-24")
     parser.add_argument("--check-fixtures", action="store_true", help="also check all official CHGame conformance fixtures")
     args = parser.parse_args()
     try:
-        result = package(args.binary.resolve(), args.output, args.version, args.date, args.check_fixtures)
+        result = package(args.binary.resolve() if args.binary else None, args.output, args.version, args.date, args.check_fixtures)
     except (OSError, ValueError, model.CartError, chgpack.ChgError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1

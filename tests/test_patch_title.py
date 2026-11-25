@@ -14,9 +14,12 @@ class TitleTests(unittest.TestCase):
         source=ROOT/'demo/sd/OTHERWRL.PAK'
         with tempfile.TemporaryDirectory(dir=ROOT/'build') as folder:
             out=Path(folder)/'test.pak'
-            attach(source,ROOT/'demo/title.bin',out)
+            _,_,_,resources=read_pack(source)
+            backdrop=Path(folder)/'title.bin'
+            backdrop.write_bytes(next(r.data for r in resources if r.kind==10))
+            attach(source,backdrop,out)
             self.assertEqual(source.read_bytes(),out.read_bytes())
-            before=out.read_bytes();attach(out,ROOT/'demo/title.bin',out)
+            before=out.read_bytes();attach(out,backdrop,out)
             self.assertEqual(before,out.read_bytes())
             _,_,_,resources=read_pack(out)
             self.assertEqual(resources[-1].kind,7)

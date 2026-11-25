@@ -12,7 +12,7 @@ from chcart import model,runtime,zipio
 import chgpack
 from build_pack import verify_pack
 
-VERSION='0.5.0'
+VERSION='0.5.1'
 
 
 def license_files():
@@ -35,12 +35,12 @@ def license_files():
 
 def package(pack_path,binary,cover,output):
     output=Path(output);output.mkdir(parents=True,exist_ok=True)
-    info=verify_pack(pack_path);data=Path(pack_path).read_bytes();firmware=Path(binary).read_bytes()
+    info=verify_pack(pack_path);data=Path(pack_path).read_bytes();firmwares={rev:Path(path).read_bytes() for rev,path in binary.items()} if isinstance(binary,dict) else {'rev0':Path(binary).read_bytes()};firmware=firmwares['rev0']
     game=model.Game(id='otherrealm',title='OTHER REALM',version=VERSION,author='bateske',
         description='Another World for CHGame. Personal conversion; original game required.',
         genre='Adventure',license='GPL-3.0-or-later AND LicenseRef-Original-Game',
         sourceUrl='https://github.com/bateske/Otherrealm',url='https://github.com/bateske/Otherrealm',
-        binaries={'rev0':firmware},sd={'OTHERWRL.PAK':data},cart_image=cover,license_files=license_files(),
+        binaries=firmwares,sd={'OTHERWRL.PAK':data},cart_image=cover,license_files=license_files(),
         buttons=[('D-pad','Move; Up jumps / swims'),('A','Run / shoot / action'),
                  ('B','Jump / menu back'),('START','Pause; hold 3 seconds to exit'),('SELECT','Pause')])
     cart=model.Cart(title='Other Realm',games=[game],version=VERSION,author='bateske',
@@ -51,6 +51,13 @@ def package(pack_path,binary,cover,output):
     if issues or zipio.to_bytes(decoded)!=archive:raise ValueError('Cartridge round-trip validation failed')
     chg=runtime.chg_file(decoded.games[0]);parsed=chgpack.parse(chg,target=chgpack.target_of('rev0'))
     if chg[512:512+parsed['payload_bytes']]!=chgpack.pad_image(firmware):raise ValueError('Firmware verification failed')
+    for revision,image in firmwares.items():
+        packed=runtime.chg_file(decoded.games[0],revision)
+        header=chgpack.parse(packed,target=chgpack.target_of(revision))
+        if packed[512:512+header['payload_bytes']]!=chgpack.pad_image(image):raise ValueError('Firmware revision mismatch')
+        (output/f'Otherrealm-{revision}.bin').write_bytes(image)
+        card=output/f'sdcard-{revision}';(card/'GAMES').mkdir(parents=True,exist_ok=True)
+        (card/'OTHERWRL.PAK').write_bytes(data);(card/'GAMES/OTHERREA.CHG').write_bytes(packed)
     (output/'Otherrealm.chgame').write_bytes(archive)
     (output/'Otherrealm.bin').write_bytes(firmware)
     (output/'cover.png').write_bytes(cover)
@@ -64,7 +71,8 @@ def package(pack_path,binary,cover,output):
     (output/'START-HERE.txt').write_text(
         'OTHER REALM - PERSONAL GAME CARTRIDGE\n\n'
         'Otherrealm.chgame: import with CHGame cartridge tools.\n'
-        'sdcard/: copy its contents to a FAT16/FAT32 card root. It adds just\n'
+        'Choose sdcard-rev0/ or sdcard-rev1/ for your board (sdcard/ is Rev0).\n'
+        'Selected folder: copy its contents to a FAT16/FAT32 card root. It adds just\n'
         'OTHERWRL.PAK and GAMES/OTHERREA.CHG, preserving existing menu files.\n'
         'Eject the card, insert it in CHGame, then choose OTHER REALM.\n'
         'Otherrealm.bin: optional direct USB upload with the board-package uploader.\n\n'

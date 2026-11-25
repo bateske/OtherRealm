@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Build Signal Grove from original JSON/vector/script assets; no game disks.
+"""Build the bundled First Contact setup guide; no commercial game data.
 
 The tiny Assembler and Shapes classes are reusable authoring primitives for
 new SD games. All game rules below compile into ordinary cooperative bytecode.
@@ -304,7 +304,7 @@ def create_script(index: int, scenes: list[dict], shapes: dict[str,int]) -> tupl
     return a.finish(),a.labels
 
 
-def build(source: Path, output: Path) -> dict:
+def build_legacy(source: Path, output: Path) -> dict:
     design = json.loads(source.read_text(encoding="utf8"))
     scenes = design["scenes"]
     if len(scenes) != 3:
@@ -344,9 +344,17 @@ def build(source: Path, output: Path) -> dict:
     return manifest
 
 
+def build(source: Path, output: Path) -> dict:
+    design = json.loads(source.read_text(encoding="utf8"))
+    if design.get("title") == "SIGNAL GROVE":
+        return build_legacy(source, output)
+    from build_guide import build as build_guide
+    return build_guide(source, output)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source",type=Path,default=ROOT/"demo/signal-grove.json")
+    parser.add_argument("--source",type=Path,default=ROOT/"demo/first-contact.json")
     parser.add_argument("--output",type=Path,default=ROOT/"demo/sd/OTHERWRL.PAK")
     args=parser.parse_args(); result=build(args.source,args.output)
     print(f"Built {result['title']}: {len(result['scenes'])} scenes, {result['bytes']} bytes, SHA256 {result['sha256']}")

@@ -1,131 +1,465 @@
 {
-  "title": "SIGNAL GROVE",
-  "source": "signal-grove.json",
-  "license": "CC0-1.0 (original game assets)",
+  "title": "FIRST CONTACT",
+  "source": "first-contact.json",
+  "license": "CC0-1.0 (original guide assets)",
   "scenes": [
     {
       "id": 16001,
-      "name": "THE HOLLOW",
-      "code_bytes": 329,
-      "shape_bytes": 3036,
+      "name": "THE EMPTY CROSSING",
+      "code_bytes": 758,
+      "shape_bytes": 944,
       "labels": {
-        "enter": 51,
-        "frame": 74,
-        "move_right": 106,
-        "moved": 110,
-        "vertical": 114,
-        "gravity": 132,
-        "bounds": 154,
-        "interact": 168,
-        "after_action": 182,
-        "no_key_hud": 204,
-        "idle": 233,
-        "display": 238,
-        "exit_left": 244,
-        "exit_right": 251,
-        "victory": 264,
-        "win_wait": 322
+        "enter": 55,
+        "frame": 78,
+        "right": 110,
+        "moved": 114,
+        "vertical": 118,
+        "gravity": 136,
+        "bounds": 158,
+        "open_path": 183,
+        "modal_input": 240,
+        "not_intro": 283,
+        "not_pages": 321,
+        "not_ending": 346,
+        "render": 346,
+        "inactive": 371,
+        "draw_actor": 399,
+        "idle": 435,
+        "cargo": 440,
+        "carry_pack": 483,
+        "hud": 488,
+        "distant": 524,
+        "next_hint": 540,
+        "modal_draw": 549,
+        "skip_intro_1": 578,
+        "skip_intro_2": 600,
+        "skip_intro_3": 622,
+        "skip_intro": 622,
+        "skip_pages_1": 651,
+        "skip_pages_2": 673,
+        "skip_pages": 673,
+        "skip_ending_1": 702,
+        "skip_ending_2": 724,
+        "skip_ending": 724,
+        "display": 724,
+        "exit_left": 730,
+        "exit_right": 737
       },
       "shapes": {
-        "background": 1244,
-        "idle": 1376,
-        "walk": 1432,
-        "crystal": 1464,
-        "crystal_glow": 1480,
-        "gate": 1496,
-        "gate_bar": 1508,
-        "open_gate": 1532,
-        "need_key": 1960,
-        "have_key": 2364,
-        "victory_panel": 2412,
-        "win": 2860,
-        "restart": 2972
+        "background": 480,
+        "active": 648,
+        "idle": 748,
+        "walk": 808,
+        "marker": 844,
+        "crate": 880,
+        "pack": 920,
+        "closed": 932
+      },
+      "text": {
+        "heading": 38,
+        "objective": 39,
+        "action": 40,
+        "done": 41,
+        "footers": {
+          "intro": [
+            45,
+            46,
+            47
+          ],
+          "pages": [
+            50,
+            47
+          ],
+          "ending": [
+            50,
+            47
+          ]
+        },
+        "intro": [
+          42,
+          43,
+          44
+        ],
+        "pages": [
+          48,
+          49
+        ],
+        "ending": [
+          51,
+          52
+        ]
       }
     },
     {
       "id": 16010,
-      "name": "RELAY SHRINE",
-      "code_bytes": 402,
-      "shape_bytes": 3112,
+      "name": "THE STEAM TERMINAL",
+      "code_bytes": 794,
+      "shape_bytes": 1016,
       "labels": {
-        "enter": 51,
-        "frame": 74,
-        "move_right": 106,
-        "moved": 110,
-        "vertical": 114,
-        "gravity": 132,
-        "bounds": 154,
-        "interact": 168,
-        "after_action": 211,
-        "small_crystal": 250,
-        "crystal_done": 257,
-        "no_key_hud": 271,
-        "idle": 300,
-        "display": 305,
-        "exit_left": 311,
-        "exit_right": 324,
-        "victory": 337,
-        "win_wait": 395
+        "enter": 55,
+        "frame": 78,
+        "right": 110,
+        "moved": 114,
+        "vertical": 118,
+        "gravity": 136,
+        "bounds": 158,
+        "open_path": 183,
+        "modal_input": 240,
+        "not_intro": 283,
+        "not_pages": 321,
+        "not_ending": 346,
+        "render": 346,
+        "inactive": 371,
+        "draw_actor": 399,
+        "idle": 435,
+        "cargo": 440,
+        "carry_pack": 483,
+        "hud": 488,
+        "distant": 524,
+        "next_hint": 540,
+        "modal_draw": 549,
+        "skip_intro_1": 578,
+        "skip_intro_2": 600,
+        "skip_intro_3": 622,
+        "skip_intro": 622,
+        "skip_pages_1": 651,
+        "skip_pages_2": 673,
+        "skip_pages_3": 695,
+        "skip_pages": 695,
+        "skip_ending_1": 724,
+        "skip_ending_2": 746,
+        "skip_ending": 746,
+        "display": 746,
+        "exit_left": 752,
+        "exit_right": 773
       },
       "shapes": {
-        "background": 1336,
-        "idle": 1452,
-        "walk": 1508,
-        "crystal": 1540,
-        "crystal_glow": 1556,
-        "gate": 1572,
-        "gate_bar": 1584,
-        "open_gate": 1608,
-        "need_key": 2036,
-        "have_key": 2440,
-        "victory_panel": 2488,
-        "win": 2936,
-        "restart": 3048
+        "background": 548,
+        "active": 736,
+        "idle": 820,
+        "walk": 880,
+        "marker": 916,
+        "crate": 952,
+        "pack": 992,
+        "closed": 1004
+      },
+      "text": {
+        "heading": 53,
+        "objective": 54,
+        "action": 55,
+        "done": 41,
+        "footers": {
+          "intro": [
+            45,
+            46,
+            47
+          ],
+          "pages": [
+            45,
+            46,
+            47
+          ],
+          "ending": [
+            50,
+            47
+          ]
+        },
+        "intro": [
+          42,
+          43,
+          44
+        ],
+        "pages": [
+          56,
+          57,
+          58
+        ],
+        "ending": [
+          51,
+          52
+        ]
       }
     },
     {
       "id": 16011,
-      "name": "THE QUIET GATE",
-      "code_bytes": 455,
-      "shape_bytes": 3132,
+      "name": "THE FILE ARCHIVE",
+      "code_bytes": 816,
+      "shape_bytes": 1124,
       "labels": {
-        "enter": 51,
-        "frame": 74,
-        "move_right": 106,
-        "moved": 110,
-        "vertical": 114,
-        "gravity": 132,
-        "bounds": 154,
-        "interact": 186,
-        "after_action": 229,
-        "gate_ready": 289,
-        "gate_open": 299,
-        "gate_done": 306,
-        "no_key_hud": 320,
-        "idle": 349,
-        "display": 354,
-        "exit_left": 360,
-        "exit_right": 373,
-        "victory": 390,
-        "win_wait": 448
+        "enter": 55,
+        "frame": 78,
+        "right": 110,
+        "moved": 114,
+        "vertical": 118,
+        "gravity": 136,
+        "bounds": 158,
+        "open_path": 183,
+        "modal_input": 240,
+        "not_intro": 283,
+        "not_pages": 321,
+        "not_ending": 346,
+        "render": 346,
+        "inactive": 371,
+        "draw_actor": 399,
+        "idle": 435,
+        "cargo": 440,
+        "carry_pack": 483,
+        "hud": 488,
+        "distant": 524,
+        "next_hint": 540,
+        "modal_draw": 549,
+        "skip_intro_1": 578,
+        "skip_intro_2": 600,
+        "skip_intro_3": 622,
+        "skip_intro": 622,
+        "skip_pages_1": 651,
+        "skip_pages_2": 673,
+        "skip_pages_3": 695,
+        "skip_pages_4": 717,
+        "skip_pages": 717,
+        "skip_ending_1": 746,
+        "skip_ending_2": 768,
+        "skip_ending": 768,
+        "display": 768,
+        "exit_left": 774,
+        "exit_right": 795
       },
       "shapes": {
-        "background": 1348,
-        "idle": 1472,
-        "walk": 1528,
-        "crystal": 1560,
-        "crystal_glow": 1576,
-        "gate": 1592,
-        "gate_bar": 1604,
-        "open_gate": 1628,
-        "need_key": 2056,
-        "have_key": 2460,
-        "victory_panel": 2508,
-        "win": 2956,
-        "restart": 3068
+        "background": 508,
+        "active": 828,
+        "idle": 928,
+        "walk": 988,
+        "marker": 1024,
+        "crate": 1060,
+        "pack": 1100,
+        "closed": 1112
+      },
+      "text": {
+        "heading": 59,
+        "objective": 60,
+        "action": 61,
+        "done": 41,
+        "footers": {
+          "intro": [
+            45,
+            46,
+            47
+          ],
+          "pages": [
+            66,
+            67,
+            68,
+            47
+          ],
+          "ending": [
+            50,
+            47
+          ]
+        },
+        "intro": [
+          42,
+          43,
+          44
+        ],
+        "pages": [
+          62,
+          63,
+          64,
+          65
+        ],
+        "ending": [
+          51,
+          52
+        ]
+      }
+    },
+    {
+      "id": 16012,
+      "name": "THE CARTRIDGE FORGE",
+      "code_bytes": 816,
+      "shape_bytes": 1064,
+      "labels": {
+        "enter": 55,
+        "frame": 78,
+        "right": 110,
+        "moved": 114,
+        "vertical": 118,
+        "gravity": 136,
+        "bounds": 158,
+        "open_path": 183,
+        "modal_input": 240,
+        "not_intro": 283,
+        "not_pages": 321,
+        "not_ending": 346,
+        "render": 346,
+        "inactive": 371,
+        "draw_actor": 399,
+        "idle": 435,
+        "cargo": 440,
+        "carry_pack": 483,
+        "hud": 488,
+        "distant": 524,
+        "next_hint": 540,
+        "modal_draw": 549,
+        "skip_intro_1": 578,
+        "skip_intro_2": 600,
+        "skip_intro_3": 622,
+        "skip_intro": 622,
+        "skip_pages_1": 651,
+        "skip_pages_2": 673,
+        "skip_pages_3": 695,
+        "skip_pages_4": 717,
+        "skip_pages": 717,
+        "skip_ending_1": 746,
+        "skip_ending_2": 768,
+        "skip_ending": 768,
+        "display": 768,
+        "exit_left": 774,
+        "exit_right": 795
+      },
+      "shapes": {
+        "background": 552,
+        "active": 764,
+        "idle": 868,
+        "walk": 928,
+        "marker": 964,
+        "crate": 1000,
+        "pack": 1040,
+        "closed": 1052
+      },
+      "text": {
+        "heading": 69,
+        "objective": 70,
+        "action": 71,
+        "done": 41,
+        "footers": {
+          "intro": [
+            45,
+            46,
+            47
+          ],
+          "pages": [
+            66,
+            67,
+            68,
+            47
+          ],
+          "ending": [
+            50,
+            47
+          ]
+        },
+        "intro": [
+          42,
+          43,
+          44
+        ],
+        "pages": [
+          72,
+          73,
+          74,
+          75
+        ],
+        "ending": [
+          51,
+          52
+        ]
+      }
+    },
+    {
+      "id": 16013,
+      "name": "THE SD CARD DOCK",
+      "code_bytes": 824,
+      "shape_bytes": 992,
+      "labels": {
+        "enter": 55,
+        "frame": 78,
+        "right": 110,
+        "moved": 114,
+        "vertical": 118,
+        "gravity": 136,
+        "bounds": 158,
+        "open_path": 183,
+        "modal_input": 240,
+        "not_intro": 283,
+        "not_pages": 321,
+        "not_ending": 346,
+        "render": 346,
+        "inactive": 371,
+        "draw_actor": 399,
+        "idle": 435,
+        "cargo": 440,
+        "carry_pack": 483,
+        "hud": 488,
+        "distant": 524,
+        "next_hint": 540,
+        "modal_draw": 549,
+        "skip_intro_1": 578,
+        "skip_intro_2": 600,
+        "skip_intro_3": 622,
+        "skip_intro": 622,
+        "skip_pages_1": 651,
+        "skip_pages_2": 673,
+        "skip_pages_3": 695,
+        "skip_pages_4": 717,
+        "skip_pages": 717,
+        "skip_ending_1": 746,
+        "skip_ending_2": 768,
+        "skip_ending": 768,
+        "display": 768,
+        "exit_left": 774,
+        "exit_right": 795
+      },
+      "shapes": {
+        "background": 460,
+        "active": 688,
+        "idle": 796,
+        "walk": 856,
+        "marker": 892,
+        "crate": 928,
+        "pack": 968,
+        "closed": 980
+      },
+      "text": {
+        "heading": 76,
+        "objective": 77,
+        "action": 78,
+        "done": 79,
+        "footers": {
+          "intro": [
+            45,
+            46,
+            47
+          ],
+          "pages": [
+            66,
+            67,
+            68,
+            47
+          ],
+          "ending": [
+            50,
+            47
+          ]
+        },
+        "intro": [
+          42,
+          43,
+          44
+        ],
+        "pages": [
+          80,
+          81,
+          82,
+          83
+        ],
+        "ending": [
+          51,
+          52
+        ]
       }
     }
   ],
-  "bytes": 24064,
-  "sha256": "a7ad7d558d7815407d59ea4df3f65e016876537e093b31437a8b057d0258b911"
+  "bytes": 48640,
+  "sha256": "4871262622fe7a6f422841bb320f3e4825b26c82c96bb0b2177dd93cda6abdcd"
 }

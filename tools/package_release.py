@@ -18,7 +18,7 @@ def main():
     for path in (app/'Otherrealm-Patcher.exe',app/'licenses/README.txt',app/'Upload-Cartridge.ps1'):
         if not path.is_file():raise FileNotFoundError(f'Build the standalone patcher first: {path}')
     subprocess.run([sys.executable,str(ROOT/'tools/package_source.py')],cwd=ROOT,check=True)
-    subprocess.run([sys.executable,str(ROOT/'tools/package_game.py'),'--version','0.5.0',
+    subprocess.run([sys.executable,str(ROOT/'tools/package_game.py'),'--version','0.5.1',
                     '--output',str(ROOT/'build/public-demo'),'--check-fixtures'],cwd=ROOT,check=True)
     with zipfile.ZipFile(destination/'Otherrealm-Patcher-Windows.zip','w',zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(app.rglob('*')):
@@ -28,9 +28,17 @@ def main():
                 raise ValueError(f'Unexpected game data in patcher: {path}')
             archive.write(path,'Otherrealm-Patcher/'+path.relative_to(app).as_posix())
     shutil.copyfile(ROOT/'build/dist/Otherrealm-source.zip',destination/'Otherrealm-source.zip')
-    shutil.copyfile(ROOT/'build/public-demo/Otherrealm.chgame',destination/'Signal-Grove.chgame')
-    names=['Otherrealm-Patcher-Windows.zip','Otherrealm-source.zip','Signal-Grove.chgame']
+    shutil.copyfile(ROOT/'build/public-demo/Otherrealm.chgame',destination/'Otherrealm.chgame')
+    names=['Otherrealm-Patcher-Windows.zip','Otherrealm-source.zip','Otherrealm.chgame']
+    for rev in ('rev0','rev1'):
+        name=f'Otherrealm-{rev}.bin'
+        shutil.copyfile(ROOT/'build/public-demo'/name,destination/name)
+        names.append(name)
+        name=f'Otherrealm-SD-{rev}.zip'
+        shutil.copyfile(ROOT/'build/public-demo'/name,destination/name)
+        names.append(name)
     for name in names:
+        if name.endswith('.bin'):continue
         with zipfile.ZipFile(destination/name) as archive:
             bad=archive.testzip()
             if bad:raise ValueError(f'{name}: failed CRC for {bad}')

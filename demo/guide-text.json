@@ -1,0 +1,65 @@
+{
+  "intro": [
+    "THIS IS A SETUP GUIDE.\nAnother World is not\nincluded in this pack.\nYou are walking through\nhow to install your own\ncopy on CHGame.",
+    "Five stations trace the\njourney: buy, find the\nfiles, build, then copy\nto your SD card.\nThese actions are a\nrehearsal. Use a real PC.",
+    "LEFT / RIGHT: walk\nUP or B: jump\nA: read a station / next\nSTART: pause / menu\n\nWalk to the lit beacon."
+  ],
+  "stations": [
+    {
+      "heading": "1/5  THE ARRIVAL",
+      "objective": "WALK TO BEACON >",
+      "action": "A: LIGHT BEACON",
+      "pages": [
+        "The beacon marks the\nstart of your journey.\nThis little adventure\nexplains how to replace\nit with Another World\non your handheld.",
+        "On a real computer:\nBuy and install the game\nfrom Steam. It includes\nthe Amiga disk files\nneeded by our patcher.\nHead right to the shop."
+      ]
+    },
+    {
+      "heading": "2/5  THE TERMINAL",
+      "objective": "FIND THE COMPUTER >",
+      "action": "A: CONNECT TERMINAL",
+      "pages": [
+        "ON YOUR COMPUTER\nOpen the Steam store.\nFind Another World -\n20th Anniversary Edition.\nIts Steam app ID is\n233550.",
+        "Buy the game to support\nits creators. Already\nown it? Open your Steam\nLibrary instead. Select\nAnother World, INSTALL,\nand finish the download.",
+        "This terminal cannot\nbuy or download anything.\nDo those steps on your\ncomputer. The light here\nonly marks a guide step.\nNext: find the disks."
+      ]
+    },
+    {
+      "heading": "3/5  THE ARCHIVE",
+      "objective": "FIND THE FILE CRATE >",
+      "action": "A: LIFT DISK CRATE",
+      "pages": [
+        "IN YOUR STEAM LIBRARY\nSelect Another World.\nChoose MANAGE, then\nBROWSE LOCAL FILES.\nThis opens the installed\ngame folder on your PC.",
+        "Open these subfolders:\nBonus\nrom Amiga\n\nFind the two .adf files:\nDiskA and DiskB.",
+        "Keep BOTH disk files.\nThese are the original\nAmiga game data, not\nprogramming source code.\nThe patcher can find them\nfrom the Steam folder.",
+        "The crate holds 2 disks.\nCarry them to the press.\nIn real life, leave the\nSteam files in place:\nthe patcher reads them\nand makes a new copy."
+      ]
+    },
+    {
+      "heading": "4/5  THE WORKSHOP",
+      "objective": "REACH THE PRESS >",
+      "action": "A: WORK THE PRESS",
+      "pages": [
+        "ON YOUR WINDOWS PC\nGet the Windows patcher\nfrom our GitHub releases:\ngithub.com/bateske/\nOtherRealm/releases\nExtract the whole ZIP.",
+        "Open this program:\nOtherrealm-Patcher.exe\n\nChoose your Steam game\nfolder, or its folder\nBonus/rom Amiga.",
+        "Choose a NEW, EMPTY\noutput folder. Click\nBUILD MY CARTRIDGE.\nWait for all five steps\nto finish successfully.\nYour source stays intact.",
+        "The output includes:\nOtherrealm.chgame\nsdcard-rev0/\nsdcard-rev1/\nChoose the folder for\nyour board at the dock."
+      ]
+    },
+    {
+      "heading": "5/5  THE CARD DOCK",
+      "objective": "CARRY PACK TO DOCK >",
+      "action": "A: LOAD CARD DOCK",
+      "pages": [
+        "ON YOUR COMPUTER\nInsert your CHGame SD\ncard in a card reader.\nUse a FAT16/FAT32 card.\nBack up its old game\nfiles before replacing.",
+        "Rev 0: sdcard-rev0/\nRev 1: sdcard-rev1/\nCopy contents to SD ROOT:\nOTHERWRL.PAK\nGAMES/OTHERREA.CHG\nNot in an sdcard folder.",
+        "For a card with several\ngames, use CHGame tools\nto import the generated\nOtherrealm.chgame into\nthe collection. This\npreserves its game menu.",
+        "Safely eject the card.\nInsert it into CHGame.\nSelect OTHER REALM.\nYour new OTHERWRL.PAK\nreplaces this guide with\nAnother World. Go right."
+      ]
+    }
+  ],
+  "ending": [
+    "GUIDE COMPLETE\nNo files were installed\nby playing this guide.\nOn your PC: buy, install,\nfind the disks, patch,\nthen copy to the card.",
+    "Your card should have:\nOTHERWRL.PAK\nGAMES/OTHERREA.CHG\nSafely eject, insert,\nand launch OTHER REALM.\nA: return to the dock."
+  ]
+}

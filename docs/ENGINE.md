@@ -9,16 +9,22 @@ The imported game's complete intro and movement tests have run on the connected
 device. The DMA SD path measured 2.30 times faster than the initial polled path
 with identical captured frames. [Hardware results](HARDWARE.md).
 
-Two games are ready:
+The public bundle and personal conversion serve different purposes:
 
-- **Signal Grove**, a small original adventure with three rooms, an animated
-  character, jumping, a crystal puzzle, a locked gate, and an ending. Its entire
-  game pack is 24,064 bytes, including its full-screen title backdrop. [Edit the game](../demo/README.md).
+- **First Contact**, the default five-room setup guide. Walk to a beacon,
+  computer, disk crate, conversion press, and SD-card dock; read each station
+  for the exact steps to perform on your computer. Native text cards explain
+  that this is a rehearsal and Another World is not bundled. [Edit the guide](../demo/README.md).
 - **Another World compatibility**, using the privately supplied Amiga disks.
   Extraction, the complete intro, opening gameplay, and startup replays of all
   seven game parts are tested. This is not a claim of a complete playthrough.
   The disk images and extracted content are excluded from version control and
-  from the redistributable demo package.
+  from the redistributable guide package. Steam's 20th Anniversary installation
+  includes the compatible Amiga pair under `Bonus/rom Amiga/`; the patcher can
+  discover it directly from the Steam game folder.
+
+The older **Signal Grove** three-room crystal adventure remains available as
+an optional authoring example via `--source demo/signal-grove.json`.
 
 ## Play
 
@@ -29,7 +35,7 @@ desired one under that root filename. Keep backups when switching games.
 | Button | Action |
 |---|---|
 | D-pad | Move; Up jumps or swims upward |
-| A | Action; run/shoot in Another World; interact in Signal Grove |
+| A | Read / next page in First Contact; run/shoot in Another World |
 | B | Up/jump shortcut; back in menus |
 | Start | Tap to pause/resume; hold three seconds to return to the system launcher |
 | Select | Open the system menu |
@@ -47,15 +53,17 @@ The full-screen shoreline title shows Lester standing after his climb and change
 you complete the game; this unlock survives starting a new game.
 Menu text uses native **8×13 Misc Fixed Bold** glyphs, with a native **5×8**
 status font, drawn directly to the 128×128 screen without scaling. These
-public-domain fonts come from PixelLogoLab. In-game text is part of the 104×65
-scene and still passes through the 128×80 nearest-neighbour presenter; that
-fractional scale can make individual letter strokes look uneven.
+public-domain fonts come from PixelLogoLab. First Contact's instructions use
+native TX text cards. Legacy vector lettering inside the 104×65 scene passes
+through the 128×80 nearest-neighbour presenter; that fractional scale can make
+individual letter strokes look uneven.
 
 The engine autosaves the nineteen original Amiga password destinations, including
 checkpoints within the city. Continue returns to the latest earned checkpoint;
 Resume in the pause menu keeps your exact current position in RAM. Death and
-password screens in the adapted pack lead to the menu. Signal Grove saves room,
-inventory, gate, and victory milestones. [Save details](checkpoints.md).
+password screens in the adapted pack lead to the menu. First Contact saves room
+and station progress; its completion flag means guide completion, not real
+installation. [Save details](checkpoints.md).
 The device journal uses two reserved flash pages and retains one installed game's
 save; switching games can replace it. Browser saves are separate, per pack, in
 local storage. Sound defaults on, with lightweight piezo cues and a menu toggle.
@@ -67,7 +75,7 @@ For the desktop preview, run a local server in this directory:
 python -m http.server 7788 --bind 127.0.0.1
 ```
 
-Open [the preview](http://127.0.0.1:7788/web/), click **Play Signal Grove**, or
+Open [the preview](http://127.0.0.1:7788/web/), choose **First Contact**, or
 load the private `.PAK` through its file picker. Arrow keys move, Space/Z is
 action, X jumps, Enter/P opens the menu, and Escape goes back. This is the actual portable C++ engine compiled
 to WebAssembly. Game files are read locally and never uploaded.
@@ -92,7 +100,8 @@ frame capture, and timing reports. See [device testing](../tools/device-test.py)
 
 `python tools/package_game.py --check-fixtures` creates a `.chgame` cartridge and SD-card ZIP under
 `build/dist/`, using the official CHGame format tooling. This package contains
-**only the original Signal Grove assets**. Packaging additionally requires Pillow.
+**only the original First Contact guide assets**, in
+`Otherrealm-Setup-Guide.chgame`. Packaging additionally requires Pillow.
 Re-run it after changing firmware. Import the cartridge into an existing game
 collection to preserve its menu; the generated SD ZIP is a standalone card layout.
 `python tools/package_source.py` creates `build/dist/Otherrealm-source.zip`
@@ -151,8 +160,9 @@ All device runtime storage is statically allocated; no game-resource heap is
 required. `OR_WIDTH` and `OR_CACHE_SLOTS` are build-time tuning parameters.
 
 This design favors compact vector content. It also retains the original game's
-occasional bitmap resources for compatibility; Signal Grove is entirely vector
-drawn. The engine has no sound mixer, desktop SDL dependency, or
+occasional bitmap resources for compatibility. First Contact combines original
+vector scenery with native TX text cards and an original title backdrop. Its
+rules are authored data; it adds no engine or firmware behavior. The engine has no sound mixer, desktop SDL dependency, or
 visual scene editor yet.
 
 ## Tests and profiling
@@ -174,8 +184,9 @@ python -m unittest discover -s tools -p test_build_pack.py
 python -m unittest discover -s tools -p test_patch_text.py
 ```
 
-The demo replay covers jumping, all room transitions, failure to open the gate
-without the crystal, backtracking, collection, unlock, victory, and restart.
+The guide replay covers reading stations, gated progress, room transitions,
+backtracking, completion, and restored progress. The retained Signal Grove
+replay covers its crystal collection and gate puzzle separately.
 The cache tests include 10,000 mixed script/data reads and failure cases.
 [Performance and compatibility evidence](PERFORMANCE.md) distinguishes
 desktop sector counts from measured hardware timings. Device screenshots and
@@ -185,7 +196,7 @@ profiling output are kept under `build/device-test/`.
 
 The compatibility implementation follows Gregory Montoir's RAW/RawGL and Fabien
 Sanglard's annotated interpreter. The engine is **GPL-2.0-or-later**; the original
-Signal Grove content is **CC0-1.0**. CHSd and the display initialization adapted
+First Contact and retained Signal Grove content are **CC0-1.0**. CHSd and the display initialization adapted
 from CHGfx retain their MIT notices. [Third-party details](../THIRD_PARTY.md).
 
 Another World is not included in the redistributable package. Its original

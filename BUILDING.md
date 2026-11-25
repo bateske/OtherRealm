@@ -14,7 +14,7 @@ arduino-cli config add board_manager.additional_urls https://github.com/bateske/
 arduino-cli core update-index
 arduino-cli core install CHGame:ch32v
 git clone https://github.com/bateske/CHGame CHGame
-git -C CHGame checkout 6f51ea690aff5c3ef893502dbdcbfbd170ab832c
+git -C CHGame checkout 921c348
 ```
 
 The release was built with board package 0.3.0 and the platform source revision
@@ -34,7 +34,7 @@ python -m pip install pillow ziglang
 
 The script selects `CHGame:ch32v:rev0`, size optimization/LTO, the nano runtime,
 game peripherals, and upload-only USB. It sets the engine include directory and
-links CHSd. The output is `build/device/release/Otherrealm.ino.bin`.
+links CHSd. The output is `build/device/rev0/release/Otherrealm.ino.bin`.
 The corresponding `.elf` and `.map` are available in the same build directory.
 
 Use `-DebugBuild` to add serial frame capture and profiling. The production build
@@ -42,8 +42,9 @@ keeps that diagnostic interface out to leave more RAM for gameplay.
 
 ## 3. Build a game pack and cartridge
 
-The current commercial-game profile accepts the tested English Amiga ADF pair.
-See [supported inputs](docs/INSTALL.md#original-game-files) before choosing files.
+The commercial-game profile accepts the English Amiga ADF pair included with
+Steam's 20th Anniversary Edition under `Bonus/rom Amiga/`. Select the Steam
+installation folder or the ADF folder; see [supported inputs](docs/INSTALL.md#original-game-files).
 Build the native title renderer, then run the one-step patcher:
 
 ```powershell
@@ -53,20 +54,24 @@ python -m ziglang c++ @core tools/capture_title.cpp -DOR_WIDTH=208 -std=c++11 -O
 python tools/patch_game.py --adf C:/Games/Original/DiskA.adf C:/Games/Original/DiskB.adf --output private/my-game
 ```
 
-`--source C:/Games/Original` can discover both ADFs in a folder instead. Use
+`--source "C:/Program Files (x86)/Steam/steamapps/common/Another World"` discovers
+the included pair under `Bonus/rom Amiga/`; an ADF folder works too. Use
 `--firmware` or `--renderer` to select other built binaries. Inputs stay unchanged;
 the output must be a new or empty folder. A full cartridge only appears after all
 validation, text adaptation, native title capture, and package checks pass.
 
-For the freely distributable original game:
+For the freely distributable First Contact setup guide:
 
 ```powershell
 python tools/build_demo.py
 python tools/package_game.py --check-fixtures
 ```
 
-This produces Signal Grove under `build/dist/` and never uses the private game.
-Only this original demo cartridge may be included in the public release.
+This produces `Otherrealm.chgame` under `build/dist/` and never uses
+the private game. The default source is `demo/first-contact.json`, with explicit
+instructions in `demo/guide-text.json`. Only this original guide cartridge may
+be included in the public release. The older Signal Grove authoring example can
+still be built with `--source demo/signal-grove.json --output build/signal-grove/OTHERWRL.PAK`.
 
 ## 4. Copy the SD files directly and upload with Arduino's tools
 
@@ -87,7 +92,7 @@ choose OTHER REALM in the launcher or upload the compiled Arduino application:
 
 Replace COM8 with your port. This invokes the board package's `chgame-upload`
 bootloader uploader with verification; it does not replace the bootloader. Use
-`-DebugBuild` if uploading the diagnostic build. For Signal Grove, use its
+`-DebugBuild` if uploading the diagnostic build. For First Contact, use its
 generated SD layout or put `demo/sd/OTHERWRL.PAK` at the card root.
 
 You can also use the [cartridge install helper](tools/Upload-Cartridge.ps1) with
@@ -104,7 +109,7 @@ With Emscripten and Node installed:
 python -m http.server 7788 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:7788/web/`. Choose Signal Grove or open a local pack.
+Open `http://127.0.0.1:7788/web/`. Choose the setup guide or open a local pack.
 Arrow keys move, Space/Z acts, X jumps, Enter/P opens the menu, and Escape goes
 back. Files stay local to the browser; device and browser saves are separate.
 
@@ -141,3 +146,17 @@ It includes the generated browser runtime when present. A plain Git checkout nee
 the host build before the browser preview will run.
 
 See [media reproduction](docs/MEDIA.md) for the cover and gameplay recording.
+
+## Both board revisions
+
+Install CHGame:ch32v 0.4.1 or later, then build each target separately:
+
+```powershell
+./tools/build-device.ps1 -Revision rev0
+./tools/build-device.ps1 -Revision rev1
+python tools/package_game.py --check-fixtures
+```
+
+Outputs use `build/device/<revision>/release/`. Packaging requires both binaries,
+validates each device's CHG header and payload, and produces one cartridge with
+both manifest entries plus separate `Otherrealm-rev0.bin` and `Otherrealm-rev1.bin`.

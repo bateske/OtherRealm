@@ -1,9 +1,10 @@
-Signal Grove and the original Other Realm wordmark
+First Contact, Signal Grove and the original Other Realm wordmark
 CC0 1.0 Universal
 
 To the extent possible under law, the authors have waived all copyright and
-related or neighboring rights to the original Signal Grove game content,
-including its JSON, procedural artwork, title image and generated game pack,
+related or neighboring rights to the original First Contact guide and Signal
+Grove game content, including their JSON, prose, procedural artwork, title
+images and generated game packs,
 and the original Other Realm wordmark artwork.
 
 These works are provided without warranty. This dedication does not apply to

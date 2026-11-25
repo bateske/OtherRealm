@@ -131,24 +131,35 @@ game data. The public downloads contain the engine, patcher, and original demo.
 
 ### 3. Install on CHGame
 
+Releases include **Otherrealm-rev0.bin**, **Otherrealm-rev1.bin**, and one
+**Otherrealm.chgame** containing both device entries. CHGame board package
+**0.4.1 or newer** supports both revisions. Select your actual board; Rev 1.5
+uses the Rev 1 binary. The two binaries have different hardware pin mappings.
+
+The patcher also builds a personal cartridge containing both revisions. When
+copying files manually, choose **sdcard-rev0/** or **sdcard-rev1/** for your
+board. The legacy **sdcard/** folder is Rev 0 only. Public SD ZIP downloads are
+likewise labeled by revision. The shared OTHERWRL.PAK is the same on both.
+
+
 With the [CHGame desktop tools](https://github.com/bateske/CHGame) installed and
 your FAT16/FAT32 card mounted, import the cartridge into the card's game collection:
 
 ```powershell
-chgame cart deploy .\Otherrealm-personal\Otherrealm.chgame --card E:\ --port COM8 --no-flash
+chgame cart deploy .\Otherrealm-personal\Otherrealm.chgame --device rev0 --card E:\ --port COM8 --no-flash
 ```
 
-Use your own drive letter and port. Safely eject the card, put it in CHGame, and
+Use your own drive letter and port, and use `--device rev1` for Rev 1. Safely eject the card, put it in CHGame, and
 select **OTHER REALM**. The bootloader installs the game from the card.
 
 **Using the Arduino board-package uploader:** first copy the contents of the
-generated `sdcard/` folder to the card root: `OTHERWRL.PAK` and
+generated `sdcard-rev0/` or `sdcard-rev1/` folder to the card root: `OTHERWRL.PAK` and
 `GAMES/OTHERREA.CHG`. Do not put them inside an extra `sdcard/` folder. Back up
 the existing game files before replacing them, then safely eject the card. From the extracted
 Windows patcher folder, run:
 
 ```powershell
-.\Upload-Cartridge.ps1 -Cartridge C:\Games\Otherrealm-personal\Otherrealm.chgame -Port COM8
+.\Upload-Cartridge.ps1 -Cartridge C:\Games\Otherrealm-personal\Otherrealm.chgame -Port COM8 -Device rev0
 ```
 
 The helper validates and extracts the `.chgame`, then calls the installed

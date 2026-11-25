@@ -106,6 +106,17 @@ static void testAmbientContinuity(const char *path){
 static void go(Session &session,Game &game,uint16_t part){for(unsigned i=0;i<200&&game.part!=part;++i)update(session,Session::Right);check(game.part==part,"session traverses authored scene");update(session);}
 static void moveX(Session &session,Game &game,int x){for(unsigned i=0;i<100&&abs(game.vm.variable(0)-x)>3;++i)update(session,game.vm.variable(0)<x?Session::Right:Session::Left);check(abs(game.vm.variable(0)-x)<=3,"session reaches authored interaction");}
 static void action(Session &session){update(session);update(session,Session::A);update(session);}
+static void closeIntro(Session &session,Game &game){
+    check(game.vm.variable(7)==0,"guide starts with introduction");
+    for(unsigned i=0;i<3&&game.vm.variable(4);++i)action(session);
+    check(!game.vm.variable(4),"introduction closes on fresh action presses");
+}
+static void readStation(Session &session,Game &game,unsigned pages){
+    const int stage=game.vm.variable(3);moveX(session,game,215);action(session);
+    check(game.vm.variable(4)==1&&game.vm.variable(7)==1,"station opens first instruction page");
+    for(unsigned i=0;i<pages;++i)action(session);
+    check(!game.vm.variable(4)&&game.vm.variable(3)==stage+1,"reading final page completes station");
+}
 
 static void testMenusAndInput(const char *path){
     FileDevice device(path);Game game(device);MemoryStorage storage;Session session(game,storage);
@@ -114,9 +125,13 @@ static void testMenusAndInput(const char *path){
     check(session.takeRedraw()&&!session.takeRedraw(),"redraw flag is consumed once");
     update(session,0,false);check(game.vm.tickCount()==0&&storage.stores==0,"lockstep input-only update does not run game");
     update(session);check(session.hasSave()&&storage.stores==1&&!session.saveFailed(),"first authored playable tick autosaves");
+    const int introX=game.vm.variable(0);
+    for(unsigned i=0;i<20;++i)update(session,Session::Right|Session::B);
+    check(storage.stores==1&&game.vm.variable(0)==introX&&game.vm.variable(8)==171&&game.vm.variable(4)==1,"reading blocks movement and jumping without extra save writes");
+    closeIntro(session,game);const unsigned earned=storage.stores;
     const CheckpointValue first=storage.value();
     for(unsigned i=0;i<20;++i)update(session,Session::Right);
-    check(storage.stores==1&&game.vm.variable(0)>first.variables[0],"movement does not repeatedly write flash");
+    check(storage.stores==earned&&game.vm.variable(0)>first.variables[0],"movement does not repeatedly write flash");
     tap(session,Session::Start);check(session.visible(),"start pauses game");
     const uint32_t ticks=game.vm.tickCount(),frames=device.frames;
     for(unsigned i=0;i<20;++i)update(session);
@@ -128,13 +143,13 @@ static void testMenusAndInput(const char *path){
     tap(session,Session::B);check(!session.visible()&&game.vm.tickCount()==ticks,"B resumes exact paused VM state");
     tap(session,Session::Select);down(session);tap(session,Session::A);
     check(!session.visible()&&game.vm.tickCount()==0&&game.vm.variable(0)==first.variables[0],"retry save restarts semantic checkpoint rather than paused position");
-    update(session);check(storage.stores==1,"retrying same milestone does not write storage");
+    update(session);check(storage.stores==earned,"retrying same milestone does not write storage");
     tap(session,Session::Start);down(session,2);tap(session,Session::A);
-    check(session.visible()&&session.hasSave()&&storage.stores==1,"new game first requests replacement confirmation");
+    check(session.visible()&&session.hasSave()&&storage.stores==earned,"new game first requests replacement confirmation");
     tap(session,Session::B);check(session.visible()&&session.hasSave(),"B cancels replacement and keeps pause menu");
     down(session,2);tap(session,Session::A);down(session);tap(session,Session::A);
-    check(!session.visible()&&!session.hasSave()&&game.vm.tickCount()==0&&storage.stores==1,"confirmed new game leaves previous disk record until playable checkpoint");
-    update(session);check(session.hasSave()&&storage.stores==2&&storage.value().variables[0]==first.variables[0],"new game replaces progress at valid initial milestone");
+    check(!session.visible()&&!session.hasSave()&&game.vm.tickCount()==0&&storage.stores==earned,"confirmed new game leaves previous disk record until playable checkpoint");
+    update(session);check(session.hasSave()&&storage.stores==earned+1&&storage.value().variables[0]==first.variables[0]&&game.vm.variable(4)==1,"new game replaces progress at initial instruction page");
     game.systemEvent(1);update(session);check(session.visible()&&game.event==0,"death system event is consumed into menu");
     tap(session,Session::A);check(!session.visible()&&game.vm.tickCount()==0,"death menu defaults to retry saved checkpoint");
     update(session);game.systemEvent(2);update(session);check(session.visible(),"ending event opens main menu");
@@ -155,35 +170,44 @@ static void testPersistenceAndFailures(const char *path){
     check(session.hasSave()&&session.saveFailed()&&!storage.available,"failed persistent write retains RAM retry checkpoint and status");
     tap(session,Session::Start);down(session);tap(session,Session::A);update(session);
     check(!session.visible()&&game.vm.variable(0)==first.variables[0],"RAM-only retry works after failed storage");
-    storage.failStore=false;go(session,game,16010);
+    storage.failStore=false;closeIntro(session,game);readStation(session,game,2);go(session,game,16010);
     check(!session.saveFailed()&&storage.available&&storage.value().part==16010,"next earned milestone repairs failed save status");
     check(session.begin(16001,false)&&!session.hasSave(),"explicit fresh session ignores prior save");
     game.systemEvent(1);update(session);check(session.visible()&&!session.hasSave(),"death before valid autosave offers new game");
     tap(session,Session::A);check(!session.visible()&&game.vm.tickCount()==0,"new game from empty death menu needs no confirmation");
 }
 
-static void testDemoMilestones(const char *path){
+static void testGuideMilestones(const char *path){
     FileDevice device(path);Game game(device);MemoryStorage storage;Session session(game,storage);
-    check(session.begin(),"begin milestone replay");tap(session,Session::A);update(session);go(session,game,16010);moveX(session,game,160);action(session);
-    check(storage.value().variables[3]==1&&game.vm.variable(3)==1,"crystal pickup autosaves same-scene inventory");
+    check(session.begin(),"begin guide milestone replay");tap(session,Session::A);update(session);
+    action(session);check(storage.value().variables[4]==2&&storage.value().variables[7]==0,"intro page advancement autosaves exact reading position");
+    check(session.begin()&&session.isTitle(),"cold restart finds intro-page save");tap(session,Session::A);tap(session,Session::A);update(session);
+    check(game.part==16001&&game.vm.variable(4)==2&&game.vm.variable(7)==0,"continue resumes exact intro page");
+    closeIntro(session,game);readStation(session,game,2);go(session,game,16010);moveX(session,game,215);action(session);action(session);
+    check(storage.value().variables[3]==1&&storage.value().variables[4]==2&&storage.value().variables[7]==1,"station reading autosaves page without completing stage early");
+    check(session.begin()&&session.isTitle(),"cold restart finds station-page save");tap(session,Session::A);tap(session,Session::A);update(session);
+    check(game.part==16010&&game.vm.variable(3)==1&&game.vm.variable(4)==2&&game.vm.variable(7)==1,"continue retains station, stage and reading page");
+    action(session);action(session);check(storage.value().variables[3]==2&&!game.vm.variable(4),"reading last station page saves completed stage");
     const unsigned earned=storage.stores;for(unsigned i=0;i<10;++i)update(session,Session::Left);
-    check(storage.stores==earned,"walking after pickup preserves checkpoint without writes");
-    check(session.begin()&&session.visible(),"cold restart finds crystal save");tap(session,Session::A);tap(session,Session::A);update(session);
-    check(game.part==16010&&game.vm.variable(3)==1,"continue after cold restart retains crystal and scene");
-    go(session,game,16011);moveX(session,game,202);action(session);
-    check(storage.value().variables[4]==1,"gate interaction earns persistent checkpoint");
-    check(session.begin(),"cold restart after gate");tap(session,Session::A);tap(session,Session::A);update(session);
+    check(storage.stores==earned,"walking after station preserves checkpoint without writes");
+    const uint16_t parts[]={16011,16012,16013};
+    for(unsigned i=0;i<3;++i){go(session,game,parts[i]);readStation(session,game,4);}
+    check(storage.value().variables[3]==5&&!game.vm.variable(6),"all five stations saved before reaching ending");
+    check(session.begin(),"cold restart after final station");tap(session,Session::A);tap(session,Session::A);update(session);
     for(unsigned i=0;i<50&&!game.vm.variable(6);++i)update(session,Session::Right);
-    check(game.vm.variable(6)==1&&storage.value().variables[6]==1,"continued gate save remains playable through saved victory");
-    check(session.hasCompleted(),"authored victory event earns persistent completion");
+    check(game.vm.variable(6)==1&&storage.value().variables[6]==1&&game.vm.variable(4)==1&&game.vm.variable(7)==2,"continued dock save reaches saved ending instructions");
+    check(session.hasCompleted(),"guide completion event earns persistent completion");
     const unsigned victoryWrites=storage.stores;
-    check(session.begin()&&session.visible(),"cold restart at victory");tap(session,Session::A);
+    check(session.begin()&&session.visible(),"cold restart at ending");tap(session,Session::A);
     check(session.hasCompleted(),"authored completion reloads with ordinary title fallback");
     update(session,Session::A); // Do not release the physical menu selection key.
     for(unsigned i=0;i<3;++i)update(session,Session::A);
-    check(game.part==16011&&game.vm.variable(6)==1&&storage.stores==victoryWrites,"held continue key cannot restart victory or replace its save");
+    check(game.part==16013&&game.vm.variable(6)==1&&game.vm.variable(4)==1&&storage.stores==victoryWrites,"held continue key cannot skip ending page or replace its save");
     update(session);update(session,Session::A);update(session);
-    check(game.part==16001&&game.vm.variable(6)==0,"action is available again after menu key is released");
+    check(game.part==16013&&game.vm.variable(4)==2&&storage.stores==victoryWrites+1,"fresh action advances and saves ending page after menu key is released");
+    action(session);check(!game.vm.variable(4)&&game.vm.variable(0)==270&&game.vm.variable(3)==5&&game.vm.variable(6)==1,"ending closes at dock and retains completed guide");
+    tap(session,Session::Start);down(session,2);tap(session,Session::A);down(session);tap(session,Session::A);update(session);
+    check(game.part==16001&&!game.vm.variable(3)&&!game.vm.variable(6)&&game.vm.variable(4)==1&&session.hasCompleted(),"New Game resets guide stages and intro while preserving earned completion");
 }
 
 static void testMenuKeyConsumption(const char *path){
@@ -191,11 +215,12 @@ static void testMenuKeyConsumption(const char *path){
     check(session.begin(),"begin menu input consumption");tap(session,Session::A);update(session);
     tap(session,Session::Start);update(session,Session::A);update(session,Session::A);
     check(!session.visible()&&game.vm.variable(0xfa)==0,"holding A to resume does not perform gameplay action");
-    update(session);update(session,Session::A);check(game.vm.variable(0xfa)==1,"fresh A press after release performs action");
-    update(session);tap(session,Session::Start);update(session,Session::B);
+    check(game.vm.variable(4)==1,"menu confirmation does not advance instruction page");
+    update(session);update(session,Session::A);check(game.vm.variable(0xfa)==1&&game.vm.variable(4)==2,"fresh A press after release advances instruction page");
+    update(session);closeIntro(session,game);tap(session,Session::Start);update(session,Session::B);
     for(unsigned i=0;i<3;++i)update(session,Session::B);
-    check(!session.visible()&&game.vm.variable(8)==155,"holding B to go back does not jump");
-    update(session);update(session,Session::B);check(game.vm.variable(8)<155,"fresh B press after release jumps");
+    check(!session.visible()&&game.vm.variable(8)==171,"holding B to go back does not jump");
+    update(session);update(session,Session::B);check(game.vm.variable(8)<171,"fresh B press after release jumps");
 }
 
 static void testCustomMenus(const char *path){
@@ -300,7 +325,7 @@ static void testCompletionUnlock(const char *path){
 
 int main(int argc,char **argv){
     const char *demo=argc>1?argv[1]:"demo/sd/OTHERWRL.PAK";
-    testPresentation(demo);testTextOnlyOverlay(demo);testAmbientContinuity(demo);testMenusAndInput(demo);testPersistenceAndFailures(demo);testDemoMilestones(demo);testMenuKeyConsumption(demo);testCustomMenus(demo);testHoldAndStaticFooter(demo);
+    testPresentation(demo);testTextOnlyOverlay(demo);testAmbientContinuity(demo);testMenusAndInput(demo);testPersistenceAndFailures(demo);testGuideMilestones(demo);testMenuKeyConsumption(demo);testCustomMenus(demo);testHoldAndStaticFooter(demo);
     if(argc>2){testOriginalIntroPolicy(argv[2]);testCompletionUnlock(argv[2]);}
     printf("Session PASS: %u checks, menu input, lockstep, continue/retry/new, failures, milestones, title, intro/skip, audio menu.\n",checks);return 0;
 }

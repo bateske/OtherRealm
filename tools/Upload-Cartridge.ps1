@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory=$true)][string]$Cartridge,
     [string]$Port,
+    [ValidateSet("rev0","rev1")][string]$Device = "rev0",
     [string]$ArduinoData = "$env:LOCALAPPDATA\Arduino15",
     [string]$Python = 'python'
 )
@@ -14,18 +15,18 @@ $extract=Join-Path ([IO.Path]::GetTempPath()) ('otherrealm-upload-'+[guid]::NewG
 $app=Join-Path $PSScriptRoot 'Otherrealm-Patcher.exe'
 if(Test-Path -LiteralPath $app){
     # PowerShell does not wait for GUI-subsystem executables unless invoked this way.
-    $extractArgs='--extract-cart "'+$cart+'" --output "'+$extract+'"'
+    $extractArgs='--device '+$Device+' --extract-cart "'+$cart+'" --output "'+$extract+'"'
     $process=Start-Process -FilePath $app -ArgumentList $extractArgs -Wait -PassThru -WindowStyle Hidden
     if($process.ExitCode){throw 'Cartridge validation failed. Use the patcher to regenerate it.'}
 }else{
-    & $Python (Join-Path $PSScriptRoot 'patch_game.py') --extract-cart $cart --output $extract
+    & $Python (Join-Path $PSScriptRoot 'patch_game.py') --extract-cart $cart --output $extract --device $Device
     if($LASTEXITCODE){throw 'Cartridge validation failed.'}
 }
 $binary=Join-Path $extract 'Otherrealm.bin'
 if(!(Test-Path -LiteralPath $binary)){throw 'Validated firmware was not produced.'}
 $arguments=@()
 if($Port){$arguments+=@('-port',$Port)}
-$arguments+=@('flash',$binary,'-device','rev0','-verify','-run')
+$arguments+=@('flash',$binary,'-device',$Device,'-verify','-run')
 & $uploader @arguments
 if($LASTEXITCODE){throw 'Upload failed. Close serial monitors and check the selected port.'}
 Write-Output 'Other Realm is running. The SD card must contain OTHERWRL.PAK.'

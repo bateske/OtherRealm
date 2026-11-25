@@ -32,6 +32,22 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual((extracted/'Otherrealm.bin').read_bytes(),firmware.read_bytes())
         self.assertEqual((extracted/'sdcard/OTHERWRL.PAK').read_bytes(),(ROOT/'demo/sd/OTHERWRL.PAK').read_bytes())
         self.assertEqual((extracted/'sdcard/GAMES/OTHERREA.CHG').read_bytes(),(output/'sdcard/GAMES/OTHERREA.CHG').read_bytes())
+    def test_both_revisions_roundtrip_and_extract(self):
+        from chcart import zipio
+        a=self.root/'rev0.bin';b=self.root/'rev1.bin'
+        a.write_bytes(bytes(range(256))*8);b.write_bytes(bytes(reversed(range(256)))*8)
+        picture=io.BytesIO();Image.new('RGB',(128,128)).save(picture,format='PNG')
+        out=self.root/'both'
+        release_cart.package(ROOT/'demo/sd/OTHERWRL.PAK',{'rev0':a,'rev1':b},picture.getvalue(),out)
+        issues=[];cart=zipio.load((out/'Otherrealm.chgame').read_bytes(),issues)
+        self.assertEqual(issues,[])
+        self.assertEqual(cart.games[0].binaries,{'rev0':a.read_bytes(),'rev1':b.read_bytes()})
+        for rev,image in [('rev0',a),('rev1',b)]:
+            target=self.root/f'extract-{rev}'
+            patch_game.extract_cartridge(out/'Otherrealm.chgame',target,rev)
+            self.assertEqual((target/'Otherrealm.bin').read_bytes(),image.read_bytes())
+            self.assertEqual((target/'sdcard/GAMES/OTHERREA.CHG').read_bytes(),(out/f'sdcard-{rev}/GAMES/OTHERREA.CHG').read_bytes())
+
     def test_existing_output_is_preserved(self):
         output=self.root/'existing';output.mkdir();sentinel=output/'keep.txt';sentinel.write_text('keep')
         with self.assertRaisesRegex(DataError,'not empty'):patch_game.convert(self.root,output)
@@ -39,10 +55,33 @@ class ReleaseTests(unittest.TestCase):
     def test_no_input_writes_no_output(self):
         with self.assertRaisesRegex(DataError,'Choose the folder'):patch_game.convert(None,self.root/'out')
         self.assertFalse((self.root/'out').exists())
-    def test_unsupported_steam_folder_writes_no_output(self):
+    def test_anniversary_resources_without_bonus_disks_write_no_output(self):
         source=self.root/'game';(source/'DAT').mkdir(parents=True)
-        with self.assertRaisesRegex(DataError,'Steam'):patch_game.convert(source,self.root/'out')
+        with self.assertRaisesRegex(DataError,'Bonus/rom Amiga'):patch_game.convert(source,self.root/'out')
         self.assertFalse((self.root/'out').exists())
+    def test_steam_root_finds_bundled_amiga_disks(self):
+        source=self.root/'Another World';bonus=source/'Bonus'/'rom Amiga';bonus.mkdir(parents=True)
+        images=[bonus/'AnotherWorld_DiskA_nologo_noprotec.adf',bonus/'AnotherWorld_DiskB_nologo_noprotec.adf']
+        for image in images:image.write_bytes(b'fixture, not commercial game data')
+        (source/'game'/'DAT').mkdir(parents=True)
+        self.assertEqual(patch_game.source_images(source),images)
+        self.assertEqual(patch_game.source_images(bonus),images)
+    def test_discovery_handles_case_and_prefers_selected_adf_folder(self):
+        source=self.root/'Another World';bonus=source/'BONUS'/'ROM AMIGA';bonus.mkdir(parents=True)
+        nested=bonus/'DiskB.ADF';nested.write_bytes(b'fixture')
+        self.assertEqual(patch_game.source_images(source),[nested])
+        direct=source/'DiskA.adf';direct.write_bytes(b'fixture')
+        self.assertEqual(patch_game.source_images(source),[direct])
+    def test_invalid_steam_bonus_disks_are_validated_without_output(self):
+        source=self.root/'Another World';bonus=source/'Bonus'/'rom Amiga';bonus.mkdir(parents=True)
+        image=bonus/'DiskA.adf';image.write_bytes(b'bad disk')
+        firmware=self.root/'firmware.bin';firmware.write_bytes(b'1234')
+        with mock_patch.object(patch_game,'helper_command',return_value=['unused']):
+            with self.assertRaises((DataError,ValueError,OSError)):
+                patch_game.convert(source,self.root/'out',binary=firmware)
+        self.assertEqual(image.read_bytes(),b'bad disk')
+        self.assertFalse((self.root/'out').exists())
+        self.assertFalse(list(self.root.glob('otherrealm-*')))
     def test_failed_conversion_cleans_staging_and_keeps_input(self):
         image=self.root/'DiskA.adf';image.write_bytes(b'bad disk')
         firmware=self.root/'firmware.bin';firmware.write_bytes(b'1234')

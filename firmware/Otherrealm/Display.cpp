@@ -4,6 +4,14 @@
 #include "Display.h"
 #include <Arduino.h>
 
+#ifndef CHGFX_DC_PORT
+#define CHGFX_DC_PORT GPIOB
+#define CHGFX_DC_PIN 0
+#define CHGFX_RST_PORT GPIOB
+#define CHGFX_RST_PIN 12
+#define CHGFX_SDCS_PORT GPIOB
+#define CHGFX_SDCS_PIN 11
+#endif
 extern "C" volatile uint32_t CFGHR_tmpA, CFGHR_tmpB, CFGHR_tmpC;
 namespace device {
 namespace {
@@ -38,15 +46,15 @@ void byte(uint8_t value) {
 }
 void cmd(uint8_t value) {
     bits(false);
-    GPIOB->BCR = 1u;
+    CHGFX_DC_PORT->BCR = 1u << CHGFX_DC_PIN;
     byte(value);
     drain();
-    GPIOB->BSHR = 1u;
+    CHGFX_DC_PORT->BSHR = 1u << CHGFX_DC_PIN;
 }
 void data(const uint8_t *p, unsigned n) { while (n--) byte(*p++); }
 void window(unsigned y, unsigned height) {
-    GPIOB->BSHR = 1u << 12;
-    pin(GPIOB, 12, 3);
+    CHGFX_SDCS_PORT->BSHR = 1u << CHGFX_SDCS_PIN;
+    pin(CHGFX_SDCS_PORT, CHGFX_SDCS_PIN, 3);
     GPIOA->BCR = 1u << 4;
     cmd(0x2A); byte(0); byte(2); byte(0); byte(129);
     cmd(0x2B); byte(0); byte(y + 3); byte(0); byte(y + height + 2);
@@ -99,9 +107,15 @@ void displayBegin() {
                      RCC_APB2Periph_GPIOC | RCC_APB2Periph_SPI1;
     RCC->AHBPCENR |= RCC_AHBPeriph_DMA1;
     GPIOA->BSHR = 1u << 4;
-    GPIOB->BSHR = 1u | (1u << 11) | (1u << 12);
+    CHGFX_DC_PORT->BSHR = 1u << CHGFX_DC_PIN;
+    CHGFX_RST_PORT->BSHR = 1u << CHGFX_RST_PIN;
+    CHGFX_SDCS_PORT->BSHR = 1u << CHGFX_SDCS_PIN;
     pin(GPIOA, 5, 11); pin(GPIOA, 7, 11); pin(GPIOA, 4, 3);
-    pin(GPIOB, 0, 3); pin(GPIOB, 11, 3); pin(GPIOB, 12, 3);
+    pin(CHGFX_DC_PORT, CHGFX_DC_PIN, 3); pin(CHGFX_RST_PORT, CHGFX_RST_PIN, 3);
+    pin(CHGFX_SDCS_PORT, CHGFX_SDCS_PIN, 3);
+#if defined(ARDUINO_CHGAME_REV1)
+    GPIOB->BCR = 1u << 9; pin(GPIOB, 9, 3);
+#endif
     // Audio owns PB10; preserve its pin configuration through the GPIO shadow.
     SPI1->CTLR1 = 0;
     SPI1->CTLR2 = 0;
@@ -124,6 +138,9 @@ void displayBegin() {
     cmd(0x3A); byte(5); cmd(0x13); delay(10); cmd(0x29); delay(100);
     drain(); GPIOA->BSHR = 1u << 4;
     displaySolid(0);
+#if defined(ARDUINO_CHGAME_REV1)
+    GPIOB->BSHR = 1u << 9;
+#endif
 }
 
 void displayPresent(const uint8_t *pixels, uint16_t width, uint16_t height,

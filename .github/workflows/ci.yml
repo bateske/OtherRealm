@@ -12,7 +12,7 @@ jobs:
         run: |
           python -m pip install pillow
           git clone https://github.com/bateske/CHGame CHGame
-          git -C CHGame checkout 6f51ea690aff5c3ef893502dbdcbfbd170ab832c
+          git -C CHGame checkout 921c348
       - name: Build native engine
         run: |
           cmake -S . -B build/native

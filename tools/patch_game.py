@@ -31,10 +31,38 @@ def helper_command(explicit=None):
 
 
 def firmware_path(explicit=None):
-    paths=[Path(explicit)] if explicit else [ROOT/'firmware/Otherrealm.bin',ROOT/'build/device/release/Otherrealm.ino.bin']
-    for p in paths:
-        if p.is_file():return p
-    raise DataError('Firmware missing. Use the release patcher, or run tools/build-device.ps1.')
+    if explicit:return Path(explicit)
+    result={}
+    for revision in ('rev0','rev1'):
+        paths=[ROOT/f'firmware/Otherrealm-{revision}.bin',ROOT/f'build/device/{revision}/release/Otherrealm.ino.bin']
+        result[revision]=next((p for p in paths if p.is_file()),None)
+        if result[revision] is None:raise DataError(f'{revision} firmware missing. Rebuild both board revisions.')
+    return result
+
+
+
+def source_images(source):
+    """Accept an ADF folder or Steam's install root with its bundled Amiga disks."""
+    if not source:raise DataError('Choose the folder containing your Steam installation or original Amiga ADF pair.')
+    folder=Path(source).expanduser().resolve()
+    if not folder.is_dir():raise DataError('Original game folder does not exist.')
+    def images_in(parent):
+        return sorted((p for p in parent.iterdir() if p.is_file() and p.suffix.lower()=='.adf'),
+                      key=lambda p:p.name.casefold())
+    images=images_in(folder)
+    if images:return images
+    # This is the publisher's bonus layout, not the anniversary engine's DAT
+    # resources. Match case-insensitively for case-sensitive host filesystems.
+    bonus=folder
+    for name in ('bonus','rom amiga'):
+        bonus=next((p for p in bonus.iterdir() if p.is_dir() and p.name.casefold()==name),None)
+        if bonus is None:break
+    if bonus is not None:
+        images=images_in(bonus)
+        if images:return images
+    raise DataError('No Amiga ADF files found. Select the Another World Steam installation folder '
+                    '(containing Bonus/rom Amiga), or the folder containing both original ADF disks. '
+                    'The anniversary game/DAT files are not the required input.')
 
 
 def convert(source,output,adfs=None,binary=None,helper=None,log=print):
@@ -42,13 +70,7 @@ def convert(source,output,adfs=None,binary=None,helper=None,log=print):
     if output==Path(output.anchor) or output==ROOT:raise DataError('Choose a dedicated output folder, not a drive or source root.')
     if output.exists() and any(output.iterdir()):raise DataError('Output folder is not empty. Choose a new folder to preserve existing files.')
     images=[Path(p).expanduser().resolve() for p in (adfs or [])]
-    if not images:
-        if not source:raise DataError('Choose the folder containing your original Amiga ADF pair.')
-        folder=Path(source).expanduser().resolve()
-        if not folder.is_dir():raise DataError('Original game folder does not exist.')
-        images=sorted(p for p in folder.iterdir() if p.is_file() and p.suffix.lower()=='.adf')
-        if not images:
-            raise DataError('No supported Amiga ADF files found. The Steam 20th Anniversary importer is being validated separately.')
+    if not images:images=source_images(source)
     binary=firmware_path(binary);renderer=helper_command(helper)
     output.parent.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='otherrealm-',dir=output.parent) as temporary:
@@ -79,7 +101,7 @@ def convert(source,output,adfs=None,binary=None,helper=None,log=print):
     return report
 
 
-def extract_cartridge(cartridge,output):
+def extract_cartridge(cartridge,output,device="rev0"):
     """Validate a personal cartridge before exposing its firmware for the uploader."""
     from chcart import zipio,runtime,model
     output=Path(output).resolve()
@@ -91,10 +113,10 @@ def extract_cartridge(cartridge,output):
     game=cart.games[0]
     if set(game.sd)!={'OTHERWRL.PAK'}:raise DataError('Unexpected SD files in cartridge.')
     output.mkdir(parents=True,exist_ok=True)
-    (output/'Otherrealm.bin').write_bytes(runtime.flash_image(game))
+    (output/'Otherrealm.bin').write_bytes(runtime.flash_image(game,device))
     (output/'sdcard'/'GAMES').mkdir(parents=True,exist_ok=True)
     (output/'sdcard'/'OTHERWRL.PAK').write_bytes(game.sd['OTHERWRL.PAK'])
-    (output/'sdcard'/'GAMES'/'OTHERREA.CHG').write_bytes(runtime.chg_file(game))
+    (output/'sdcard'/'GAMES'/'OTHERREA.CHG').write_bytes(runtime.chg_file(game,device))
 
 
 def gui():
@@ -108,13 +130,13 @@ def gui():
     style.configure('TButton',padding=8);style.configure('Title.TLabel',font=('Segoe UI',24,'bold'),foreground='#d5b66b')
     panel=ttk.Frame(root,padding=24);panel.pack(fill='both',expand=True)
     ttk.Label(panel,text='OTHER REALM',style='Title.TLabel').pack(anchor='w')
-    ttk.Label(panel,text='Your Amiga ADF pair. One handheld cartridge.',font=('Segoe UI',11)).pack(anchor='w',pady=(0,20))
+    ttk.Label(panel,text='Your Steam bonus disks. One handheld cartridge.',font=('Segoe UI',11)).pack(anchor='w',pady=(0,20))
     source=tk.StringVar();destination=tk.StringVar(value=str(Path.home()/'Desktop'/'Otherrealm-personal'))
     def field(label,variable,choose):
         ttk.Label(panel,text=label).pack(anchor='w');row=ttk.Frame(panel);row.pack(fill='x',pady=(4,12))
         ttk.Entry(row,textvariable=variable).pack(side='left',fill='x',expand=True)
         ttk.Button(row,text='Browse...',command=choose).pack(side='right',padx=(8,0))
-    field('Original Amiga game folder (Steam import is not supported yet)',source,lambda:source.set(filedialog.askdirectory() or source.get()))
+    field('Another World Steam folder or Amiga ADF folder',source,lambda:source.set(filedialog.askdirectory() or source.get()))
     field('New output folder',destination,lambda:destination.set(filedialog.askdirectory() or destination.get()))
     ttk.Label(panel,text='Creates the cartridge, cover, SD files and a verification report.\nYour source game files are never changed.',wraplength=640).pack(anchor='w',pady=(0,12))
     messages=queue.Queue();log=tk.Text(panel,height=7,bg='#0b1220',fg='#c4d5e9',relief='flat',font=('Consolas',10),state='disabled')
@@ -137,16 +159,17 @@ def gui():
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--source',type=Path,help='original game installation or ADF folder')
+    p.add_argument('--source',type=Path,help='Another World Steam installation (Bonus/rom Amiga) or ADF folder')
     p.add_argument('--adf',nargs='+',type=Path,help='original Amiga disk images')
     p.add_argument('--output',type=Path,default=Path('Otherrealm-personal'))
     p.add_argument('--firmware',type=Path);p.add_argument('--renderer',type=Path)
+    p.add_argument('--device',choices=('rev0','rev1'),default='rev0')
     p.add_argument('--gui',action='store_true')
     p.add_argument('--extract-cart',type=Path,help='validate a .chgame and extract its firmware / SD files')
     a=p.parse_args()
     if a.gui or not a.source and not a.adf and not a.extract_cart:return gui()
     try:
-        if a.extract_cart:extract_cartridge(a.extract_cart,a.output)
+        if a.extract_cart:extract_cartridge(a.extract_cart,a.output,a.device)
         else:convert(a.source,a.output,a.adf,a.firmware,a.renderer)
     except (OSError,ValueError) as e:p.exit(1,f'Error: {e}\n')
     return 0

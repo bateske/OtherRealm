@@ -63,7 +63,7 @@ image. It does not directly parse `.chgame` archives. The included helper valida
 your cartridge, extracts its firmware, and calls that exact uploader:
 
 1. Back up existing game files, then drag the **contents** of the generated
-   `sdcard/` folder to the card root: **`OTHERWRL.PAK`** and
+   `sdcard-rev0/` or `sdcard-rev1/` folder to the card root: **`OTHERWRL.PAK`** and
    **`GAMES/OTHERREA.CHG`**. Do not nest them inside an `sdcard/` folder. Safely
    eject the card. This replaces the guide's data and application files without
    replacing menu indexes. Use the cartridge tools above to add a menu entry to
@@ -105,3 +105,13 @@ data directly, rebuilding the simulator, and testing the source patcher.
   an extra `sdcard` folder. Use FAT16/FAT32, not exFAT.
 - **Another game was played:** CHGame currently shares a small flash save area.
   A different game's first save can replace this game's checkpoint.
+
+## Board revisions
+
+Use CHGame board package 0.4.1 or later. The public and personal cartridges
+contain both `rev0` and `rev1` binaries. Select the device when deploying:
+`--device rev0` or `--device rev1`. Rev 1.5 uses Rev 1.
+
+For manual copying, use `sdcard-rev0/` or `sdcard-rev1/`; the legacy `sdcard/`
+folder is Rev 0 only. With Upload-Cartridge.ps1, pass `-Device rev0` or
+`-Device rev1`. Never upload a raw binary for the other revision.
