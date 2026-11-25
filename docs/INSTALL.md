@@ -1,14 +1,16 @@
 # Build your personal cartridge
 
-The public download contains the engine and patcher. Your original Another World
-files stay on your computer. The generated `.chgame` and `OTHERWRL.PAK` contain
-your game data and are for your personal use.
+The public download contains the engine, patcher, and **First Contact**, a
+playable setup guide. Another World is not included. The guide's actions are a
+rehearsal; perform the purchase, conversion, and card copy on your computer.
+Your original files stay on your computer. The generated personal `.chgame` and
+`OTHERWRL.PAK` contain your game data and are for your personal use.
 
 ## Windows release tool
 
 1. Extract the entire `Otherrealm-Patcher-Windows.zip` folder.
 2. Open `Otherrealm-Patcher.exe`.
-3. Select your original game folder and a new, empty output folder.
+3. Select the Steam game's `Bonus/rom Amiga/` folder and a new, empty output folder.
 4. Choose **Build my cartridge**. All five steps must complete successfully.
 
 The builder writes `Otherrealm.chgame`, `Otherrealm.bin`, a native cover,
@@ -16,17 +18,25 @@ The builder writes `Otherrealm.chgame`, `Otherrealm.bin`, a native cover,
 
 ### Original game files
 
-The validated profile currently accepts the English Amiga game, with both ADF
-disks in one folder. It recovers the resource directory and strings from the
-executable, checks the script revision, and rejects an unsupported revision
-without writing a partial cartridge.
+Buy and install [Another World — 20th Anniversary Edition on Steam](https://store.steampowered.com/app/233550/Another_World__20th_Anniversary_Edition/)
+(app 233550). If you own it already, install it from your Library. Choose
+**Library → Another World → Manage → Browse local files** to open its installed
+folder. Its **`Bonus/rom Amiga/`** folder contains both supported original disks:
 
-The [Steam 20th Anniversary edition](https://store.steampowered.com/app/233550/Another_World__20th_Anniversary_Edition/)
-uses a different layout. Its installation is available through Steam Library →
-Another World → Manage → Browse local files. The `game/DAT`, `game/BGZ` and
-`game/TXT` directories belong to that edition; they are not Amiga disk images.
-Steam import is pending validation against a local installation. Buying the
-Steam edition alone does not currently supply the ADF input this profile needs.
+```text
+AnotherWorld_DiskA_nologo_noprotec.adf
+AnotherWorld_DiskB_nologo_noprotec.adf
+```
+
+Choose `Bonus/rom Amiga/` in the patcher. This also works with older patcher
+builds. Updated builds can find the disks from the Steam installation folder
+itself. No extraction of the disks is needed.
+Both disks must be present. The English Amiga pair included in the local Steam
+installation has been verified through the complete cartridge conversion.
+The patcher reads the disks, recovers the resource directory and strings, checks
+the script revision, and leaves the original files unchanged. Unsupported
+revisions stop without writing a partial cartridge. The anniversary resources
+in `game/DAT`, `game/BGZ`, and `game/TXT` are not used by this conversion.
 
 ## Install with the CHGame cartridge tools
 
@@ -52,8 +62,12 @@ The Boards Manager package includes `chgame-upload`, which flashes a firmware
 image. It does not directly parse `.chgame` archives. The included helper validates
 your cartridge, extracts its firmware, and calls that exact uploader:
 
-1. Copy the **contents** of the generated `sdcard/` folder to the card root and
-   safely eject it. This adds two files and does not replace menu indexes.
+1. Back up existing game files, then drag the **contents** of the generated
+   `sdcard/` folder to the card root: **`OTHERWRL.PAK`** and
+   **`GAMES/OTHERREA.CHG`**. Do not nest them inside an `sdcard/` folder. Safely
+   eject the card. This replaces the guide's data and application files without
+   replacing menu indexes. Use the cartridge tools above to add a menu entry to
+   an existing multi-game collection.
 2. Connect CHGame by USB and run from the extracted patcher folder:
 
 ```powershell
@@ -82,6 +96,9 @@ data directly, rebuilding the simulator, and testing the source patcher.
 
 - **Unsupported script revision:** keep your input files unchanged and report
   the edition and validation error. The patcher deliberately avoids guessing.
+- **No supported Amiga files found:** finish the Steam download, then choose the
+  Another World installation folder or `Bonus/rom Amiga/`. Confirm that both
+  `.adf` disks are present; do not rename the anniversary edition's resource files.
 - **Output folder is not empty:** choose a new folder; old builds are preserved.
 - **Port busy:** close serial monitors and Web Serial connections, then retry.
 - **Red screen / no game data:** put `OTHERWRL.PAK` in the card root, not inside

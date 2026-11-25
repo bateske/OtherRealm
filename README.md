@@ -60,7 +60,6 @@ autosaves, readable menus, and a little magic.
 - **A quiet bit of atmosphere.** Menus fade over the darkened scene, with wandering sparkles, selection dust, and a soft confirmation burst.
 - **A reward for finishing.** Complete the game to unlock the raised-hand greeting as your title background.
 - **Your files, your cartridge.** The patcher validates your original resources, adapts them, renders the title scenes, and packages a personal `.chgame`.
-- **An original game included.** [Signal Grove](demo/README.md) is a small, freely distributable vector adventure for trying the engine or learning to author scenes.
 
 ## Controls
 
@@ -84,30 +83,36 @@ toggled in the menu.
 
 ## Getting started
 
+**Buy the game, build your personal cartridge, then install that cartridge.**
+The public download supplies the engine; your purchased game supplies the data.
+
 ### 1. Own the original game
 
-Support the original creators: [Another World — 20th Anniversary Edition on Steam](https://store.steampowered.com/app/233550/Another_World__20th_Anniversary_Edition/).
+Buy [Another World — 20th Anniversary Edition on Steam](https://store.steampowered.com/app/233550/Another_World__20th_Anniversary_Edition/)
+to support the original creators. Already own it? Open your Steam Library and
+install it. Then choose **Another World → Manage → Browse local files**.
 
-> **Current release: Amiga profile, Steam import pending.** The validated patcher
-> accepts the English Amiga ADF pair used during development. The Steam edition
-> uses different resources and has not yet been validated. Buying Steam alone
-> does **not** currently provide the ADF input this release needs. You can try
-> the included original **Signal Grove** game without supplying any commercial data.
+The Steam installation includes the original Amiga disks in **`Bonus/rom Amiga/`**:
 
-To locate a Steam installation, use **Library → Another World → Manage → Browse
-local files**. The anniversary edition keeps its resources under `game/DAT`,
-`game/BGZ`, and `game/TXT`. Keep that folder intact for future Steam support;
-renaming those files will not turn them into the supported Amiga edition.
+```text
+AnotherWorld_DiskA_nologo_noprotec.adf
+AnotherWorld_DiskB_nologo_noprotec.adf
+```
 
-For the current profile, place both of your original Amiga `.adf` disks in one
-folder. The patcher checks the executable and scripts before applying adaptations;
-an unsupported revision stops with an error instead of producing a broken game.
+Select **`Bonus/rom Amiga/`** in the patcher, or a folder containing your
+supported English Amiga ADF pair. Leave both disks together. Updated patcher
+builds can also find the bonus disks from the Steam installation folder itself.
+These are game data, not programming source code. The patcher validates the
+executable and scripts before applying adaptations and stops on unsupported data.
+The anniversary edition's `game/DAT`, `game/BGZ`, and `game/TXT` resources are not
+the input used by this Amiga conversion.
 
 ### 2. Build your personal cartridge
 
 Download **Otherrealm-Patcher-Windows.zip** from [Releases](https://github.com/bateske/OtherRealm/releases).
-Extract the entire folder, open **Otherrealm-Patcher.exe**, choose your source
-folder and a new output folder, then click **Build my cartridge**.
+Extract the entire folder, open **Otherrealm-Patcher.exe**, choose the
+**`Bonus/rom Amiga/`** folder and a new, empty output folder, then click **Build my
+cartridge**. Wait for all five steps to succeed.
 
 No Python, Node, compiler, or online account is needed to run the Windows patcher.
 It leaves your source files unchanged and writes:
@@ -137,7 +142,9 @@ Use your own drive letter and port. Safely eject the card, put it in CHGame, and
 select **OTHER REALM**. The bootloader installs the game from the card.
 
 **Using the Arduino board-package uploader:** first copy the contents of the
-generated `sdcard/` folder to the card root and safely eject it. From the extracted
+generated `sdcard/` folder to the card root: `OTHERWRL.PAK` and
+`GAMES/OTHERREA.CHG`. Do not put them inside an extra `sdcard/` folder. Back up
+the existing game files before replacing them, then safely eject the card. From the extracted
 Windows patcher folder, run:
 
 ```powershell
@@ -148,6 +155,16 @@ The helper validates and extracts the `.chgame`, then calls the installed
 `chgame-upload` tool from the CHGame board package. That uploader accepts firmware
 images rather than `.chgame` archives directly. The SD data is needed with either
 installation method.
+
+<details>
+<summary>Installed the public cartridge before adding your game files?</summary>
+
+There is a little detour waiting for you: the bundled adventure is a playable
+setup guide. Follow its stations, or complete the steps above on your computer.
+Installing your generated personal cartridge replaces the guide with Another
+World. Playing the guide itself does not buy, download, or install the game.
+
+</details>
 
 See the [complete installation guide](docs/INSTALL.md) for tool setup and
 troubleshooting. Prefer compiling the engine and copying files yourself? Follow
@@ -233,7 +250,7 @@ Media capture provenance is in [docs/MEDIA.md](docs/MEDIA.md).
 |---|---|
 | Portable engine and applicable source tools | [GPL-2.0-or-later](LICENSE) |
 | Combined device build and release packager | [GPL-3.0-or-later](firmware/Otherrealm/LICENSE_GPL3.txt) |
-| Original Signal Grove content and Other Realm wordmark | [CC0-1.0](demo/LICENSE.txt) |
+| Original First Contact / Signal Grove content and Other Realm wordmark | [CC0-1.0](demo/LICENSE.txt) |
 | Original Another World game content | Rights remain with its respective owners; not included as playable data |
 
 This is an independent compatibility project, not an official port or an
